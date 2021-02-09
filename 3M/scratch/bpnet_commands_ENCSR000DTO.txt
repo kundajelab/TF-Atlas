@@ -1,0 +1,90 @@
+train \
+    --input-data /users/zahoor/TF-Atlas/02-08-2021/jsons/ENCSR000DTO_input.json \
+    --stranded \
+    --output-dir /users/zahoor/TF-Atlas/02-08-2021/models/ENCSR000DTO \
+    --reference-genome /users/zahoor/reference/hg38.genome.fa \
+    --chrom-sizes /users/zahoor/reference/GRCh38_EBV.chrom.sizes \
+    --chroms $(cat /users/zahoor/reference/hg38_chroms.txt) \
+    --shuffle \
+    --epochs 100 \
+    --splits /users/zahoor/TF-Atlas/02-08-2021/jsons/one_split.json \
+    --model-arch-name BPNet1000d8 \
+    --model-output-filename ENCSR000DTO \
+    --input-seq-len 2114 \
+    --output-len 1000 \
+    --filters 64 \
+    --threads 10
+
+predict \
+    --model /users/zahoor/TF-Atlas/02-08-2021/models/ENCSR000DTO/ENCSR000DTO_split000.h5 \
+    --chrom-sizes ~/reference/GRCh38_EBV.chrom.sizes \
+    --chroms $(cat /users/zahoor/reference/hg38_chroms.txt) \
+    --reference-genome /users/zahoor/reference/hg38.genome.fa \
+    --exponentiate-counts \
+    --output-dir /users/zahoor/TF-Atlas/02-08-2021/predictions/ENCSR000DTO \
+    --input-data /users/zahoor/TF-Atlas/02-08-2021/jsons/ENCSR000DTO_input.json \
+    --predict-peaks \
+    --write-buffer-size 2000 \
+    --batch-size 1 \
+    --stranded \
+    --input-seq-len 2114 \
+    --output-len 1000 \
+    --output-window-size 1000
+
+
+interpret \
+    --reference-genome /users/zahoor/reference/hg38.genome.fa \
+    --model /users/zahoor/TF-Atlas/02-08-2021/models/ENCSR000DTO/ENCSR000DTO_split000.h5 \
+    --bed-file /users/zahoor/TF-Atlas/data/idr_peaks/ENCFF832INR.bed.gz \
+    --chroms $(cat /users/zahoor/reference/hg38_chroms.txt) \
+    --output-dir /users/zahoor/TF-Atlas/02-08-2021/interpretations/ENCSR000DTO \
+    --input-seq-len 2114 \
+    --control-len 1000
+
+MODISCO_PROFILE_DIR=/users/zahoor/TF-Atlas/02-08-2021/modisco/ENCSR000DTO/profile
+modisco \
+    --scores-path /users/zahoor/TF-Atlas/02-08-2021/interpretations/ENCSR000DTO/profile_scores.h5 \
+    --output-directory $MODISCO_PROFILE_DIR
+
+MODISCO_COUNTS_DIR=/users/zahoor/TF-Atlas/02-08-2021/modisco/ENCSR000DTO/counts
+modisco \
+    --scores-path /users/zahoor/TF-Atlas/02-08-2021/interpretations/ENCSR000DTO/counts_scores.h5 \
+    --output-directory $MODISCO_COUNTS_DIR
+
+
+bounds \
+--input-profiles /users/zahoor/TF-Atlas/data/bigWigs/ENCSR000DTO_plus.bw /users/zahoor/TF-Atlas/data/bigWigs/ENCSR000DTO_minus.bw \
+--output-names plus minus \
+--output-directory /users/zahoor/TF-Atlas/02-08-2021/bounds/ENCSR000DTO \
+--peaks /users/zahoor/TF-Atlas/data/idr_peaks/ENCFF832INR.bed.gz \
+--chroms $(cat /users/zahoor/reference/hg38_chroms.txt)
+
+
+
+
+metrics \
+   -A /users/zahoor/TF-Atlas/data/bigWigs/ENCSR000DTO_plus.bw \
+   -B /users/zahoor/TF-Atlas/02-08-2021/predictions/ENCSR000DTO/ENCSR000DTO_split000_task0_plus.bw \
+   --peaks /users/zahoor/TF-Atlas/data/idr_peaks/ENCFF832INR.bed.gz \
+   --chroms $(cat /users/zahoor/reference/hg38_chroms.txt)  \
+   --output-dir /users/zahoor/TF-Atlas/02-08-2021/metrics/ENCSR000DTO/plus \
+   --apply-softmax-to-profileB \
+   --countsB /users/zahoor/TF-Atlas/02-08-2021/predictions/ENCSR000DTO/ENCSR000DTO_split000_task0_plus_exponentiated_counts.bw \
+   --chrom-sizes /users/zahoor/reference/GRCh38_EBV.chrom.sizes \
+   --bounds-csv /users/zahoor/TF-Atlas/02-08-2021/bounds/ENCSR000DTO/plus.bds
+
+
+metrics \
+   -A /users/zahoor/TF-Atlas/data/bigWigs/ENCSR000DTO_minus.bw \
+   -B /users/zahoor/TF-Atlas/02-08-2021/predictions/ENCSR000DTO/ENCSR000DTO_split000_task0_minus.bw \
+   --peaks /users/zahoor/TF-Atlas/data/idr_peaks/ENCFF832INR.bed.gz \
+   --chroms $(cat /users/zahoor/reference/hg38_chroms.txt)  \
+   --output-dir /users/zahoor/TF-Atlas/02-08-2021/metrics/ENCSR000DTO/minus \
+   --apply-softmax-to-profileB \
+   --countsB /users/zahoor/TF-Atlas/02-08-2021/predictions/ENCSR000DTO/ENCSR000DTO_split000_task0_minus_exponentiated_counts.bw \
+   --chrom-sizes /users/zahoor/reference/GRCh38_EBV.chrom.sizes \
+   --bounds-csv /users/zahoor/TF-Atlas/02-08-2021/bounds/ENCSR000DTO/minus.bds
+
+
+
+

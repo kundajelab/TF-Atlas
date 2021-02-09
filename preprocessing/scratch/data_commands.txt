@@ -1,0 +1,294 @@
+
+# https://www.encodeproject.org/experiment-series/ENCSR939CXR/
+# this is the 1st experiment in the series
+# https://www.encodeproject.org/experiments/ENCSR000BGZ/
+
+# filter, but keep dups
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF359ZYL.bam -o data/F780/ENCFF359ZYL.bam
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF768YYZ.bam -o data/F780/ENCFF768YYZ.bam 
+
+# merge the new bams and create index
+## samtools merge -f data/F780/ENCSR000BGZ.bam data/F780/ENCFF359ZYL.bam data/F780/ENCFF768YYZ.bam
+## samtools index data/F780/ENCSR000BGZ.bam
+
+# get coverage of 5’ positions of the plus strand
+## bedtools genomecov -5 -bg -strand + \
+        -ibam data/F780/ENCSR000BGZ.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BGZ_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+## bedtools genomecov -5 -bg -strand - \
+        -ibam data/F780/ENCSR000BGZ.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BGZ_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000BGZ_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BGZ_plus.bw
+
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000BGZ_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BGZ_minus.bw
+    
+# this is the control for ENCSR000BGZ/
+# https://www.encodeproject.org/experiments/ENCSR000BGH/ 
+
+# filter, but keep dups
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF745UOD.bam -o data/F780/ENCFF745UOD.bam
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF379YGC.bam -o data/F780/ENCFF379YGC.bam
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF070THX.bam -o data/F780/ENCFF070THX.bam
+
+# merge the new bams and create index
+## samtools merge -f data/F780/ENCSR000BGZ_control.bam data/F780/ENCFF745UOD.bam data/F780/ENCFF379YGC.bam data/F780/ENCFF070THX.bam
+## samtools index data/F780/ENCSR000BGZ_control.bam
+
+# get coverage of 5’ positions of the plus strand
+## bedtools genomecov -5 -bg -strand + \
+        -ibam data/F780/ENCSR000BGZ_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BGZ_control_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+## bedtools genomecov -5 -bg -strand - \
+        -ibam data/F780/ENCSR000BGZ_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BGZ_control_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000BGZ_control_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BGZ_control_plus.bw
+    
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000BGZ_control_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BGZ_control_minus.bw
+    
+    
+# this is the 2nd experiment in the series
+# https://www.encodeproject.org/experiments/ENCSR725VFL/
+# pair ended 
+
+# merge the new bams and create index
+## samtools merge -f data/filtered_bams/ENCSR725VFL.bam data/filtered_bams/ENCFF781YRX.bam data/filtered_bams/ENCFF275DGB.bam
+## samtools index data/filtered_bams/ENCSR725VFL.bam
+
+# get coverage of 5’ positions of the plus strand
+## bedtools genomecov -5 -bg -strand + \
+        -ibam data/filtered_bams/ENCSR725VFL.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR725VFL_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+## bedtools genomecov -5 -bg -strand - \
+        -ibam data/filtered_bams/ENCSR725VFL.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR725VFL_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR725VFL_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR725VFL_plus.bw
+
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR725VFL_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR725VFL_minus.bw
+
+# this is the control for ENCSR725VFL/
+https://www.encodeproject.org/experiments/ENCSR956WYO/
+
+# merge the new bams and create index
+## samtools merge -f data/filtered_bams/ENCSR725VFL_control.bam data/filtered_bams/ENCFF377KFK.bam data/filtered_bams/ENCFF232AKP.bam
+## samtools index data/filtered_bams/ENCSR725VFL_control.bam
+
+# get coverage of 5’ positions of the plus strand
+## bedtools genomecov -5 -bg -strand + \
+        -ibam data/filtered_bams/ENCSR725VFL_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR725VFL_control_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+## bedtools genomecov -5 -bg -strand - \
+        -ibam data/filtered_bams/ENCSR725VFL_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR725VFL_control_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+##~/./bedGraphToBigWig data/bedGraphs/ENCSR725VFL_control_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR725VFL_control_plus.bw
+
+##~/./bedGraphToBigWig data/bedGraphs/ENCSR725VFL_control_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR725VFL_control_minus.bw
+
+
+
+
+
+
+**********************************************************************************
+
+# https://www.encodeproject.org/experiment-series/ENCSR092DWU/
+# this is the 1st experiment in the series
+# https://www.encodeproject.org/experiments/ENCSR000DTO/
+
+# filter, but keep dups
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF297KRO.bam -o data/F780/ENCFF297KRO.bam
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF510KKB.bam -o data/F780/ENCFF510KKB.bam 
+
+# merge the new bams and create index
+## samtools merge -f data/F780/ENCSR000DTO.bam data/F780/ENCFF297KRO.bam data/F780/ENCFF510KKB.bam
+## samtools index data/F780/ENCSR000DTO.bam
+
+# get coverage of 5’ positions of the plus strand
+## bedtools genomecov -5 -bg -strand + \
+        -ibam data/F780/ENCSR000DTO.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000DTO_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+## bedtools genomecov -5 -bg -strand - \
+        -ibam data/F780/ENCSR000DTO.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000DTO_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000DTO_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000DTO_plus.bw
+
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000DTO_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000DTO_minus.bw
+
+
+# this is the control for ENCSR000DTO/
+# https://www.encodeproject.org/experiments/ENCSR000DTP/ 
+
+# filter, but keep dups
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF264SJR.bam -o data/F780/ENCFF264SJR.bam
+
+# merge the new bams and create index
+## samtools merge -f data/F780/ENCSR000DTO_control.bam data/F780/ENCFF264SJR.bam # use cp data/F780/ENCFF264SJR.bam data/F780/ENCSR000DTO_control.bam
+## samtools index data/F780/ENCSR000DTO_control.bam
+
+# get coverage of 5’ positions of the plus strand
+## bedtools genomecov -5 -bg -strand + \
+        -ibam data/F780/ENCSR000DTO_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000DTO_control_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+## bedtools genomecov -5 -bg -strand - \
+        -ibam data/F780/ENCSR000DTO_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000DTO_control_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000DTO_control_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000DTO_control_plus.bw
+    
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000DTO_control_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000DTO_control_minus.bw
+
+
+# this is the 2nd experiment in the series
+# https://www.encodeproject.org/experiments/ENCSR000BSE/
+
+# filter, but keep dups
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF321CBF.bam -o data/F780/ENCFF321CBF.bam
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF679GVY.bam -o data/F780/ENCFF679GVY.bam 
+
+# merge the new bams and create index
+## samtools merge -f data/F780/ENCSR000BSE.bam data/F780/ENCFF321CBF.bam data/F780/ENCFF679GVY.bam
+## samtools index data/F780/ENCSR000BSE.bam
+
+# get coverage of 5’ positions of the plus strand
+## bedtools genomecov -5 -bg -strand + \
+        -ibam data/F780/ENCSR000BSE.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BSE_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+## bedtools genomecov -5 -bg -strand - \
+        -ibam data/F780/ENCSR000BSE.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BSE_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000BSE_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BSE_plus.bw
+
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000BSE_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BSE_minus.bw
+    
+# this is the control for ENCSR000BSE/
+# https://www.encodeproject.org/experiments/ENCSR000BVT/ 
+
+# filter, but keep dups
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF761OIH.bam -o data/F780/ENCFF761OIH.bam
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF264PNB.bam -o data/F780/ENCFF264PNB.bam
+
+# merge the new bams and create index
+## samtools merge -f data/F780/ENCSR000BSE_control.bam data/F780/ENCFF761OIH.bam data/F780/ENCFF264PNB.bam
+## samtools index data/F780/ENCSR000BSE_control.bam
+
+# get coverage of 5’ positions of the plus strand
+## bedtools genomecov -5 -bg -strand + \
+        -ibam data/F780/ENCSR000BSE_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BSE_control_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+## bedtools genomecov -5 -bg -strand - \
+        -ibam data/F780/ENCSR000BSE_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BSE_control_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+## ~/./bedGraphToBigWig data/bedGraphs/ENCSR000BSE_control_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BSE_control_plus.bw
+    
+##~/./bedGraphToBigWig data/bedGraphs/ENCSR000BSE_control_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BSE_control_minus.bw
+
+
+
+
+
+
+
+
+# this is the 3rd experiment in the series
+# https://www.encodeproject.org/experiments/ENCSR240PRQ/
+# This experiments has mixed run types
+# ENCFF947TBI derived from paired-ended fastq
+# ENCFF844RTD derived from single-ended fastq
+
+# filter, but keep dups
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF844RTD.bam -o data/F780/ENCFF844RTD.bam
+
+# merge the new bams and create index
+## samtools merge -f data/F780/ENCSR240PRQ.bam data/F780/ENCFF844RTD.bam data/filtered_bams/ENCFF603FXX.bam
+samtools index data/F780/ENCSR240PRQ.bam
+
+# get coverage of 5’ positions of the plus strand
+bedtools genomecov -5 -bg -strand + \
+        -ibam data/F780/ENCSR240PRQ.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR240PRQ_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+bedtools genomecov -5 -bg -strand - \
+        -ibam data/F780/ENCSR240PRQ.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR240PRQ_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+~/./bedGraphToBigWig data/bedGraphs/ENCSR240PRQ_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR240PRQ_plus.bw
+
+~/./bedGraphToBigWig data/bedGraphs/ENCSR240PRQ_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR240PRQ_minus.bw
+    
+# this is the control for ENCSR240PRQ/
+# https://www.encodeproject.org/experiments/ENCSR000BVT/ 
+
+# filter, but keep dups
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF761OIH.bam -o data/F780/ENCFF761OIH.bam
+## samtools view -F 780 -q 30 -b data/unfiltered_bams/ENCFF264PNB.bam -o data/F780/ENCFF264PNB.bam
+
+# merge the new bams and create index
+## samtools merge -f data/F780/ENCSR000BSE_control.bam data/F780/ENCFF761OIH.bam data/F780/ENCFF264PNB.bam
+samtools index data/F780/ENCSR000BSE_control.bam
+
+# get coverage of 5’ positions of the plus strand
+bedtools genomecov -5 -bg -strand + \
+        -ibam data/F780/ENCSR000BSE_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BSE_control_plus.bedGraph
+
+# get coverage of 5’ positions of the minus strand
+bedtools genomecov -5 -bg -strand - \
+        -ibam data/F780/ENCSR000BSE_control.bam \
+        | sort -k1,1 -k2,2n > data/bedGraphs/ENCSR000BSE_control_minus.bedGraph
+
+# Convert bedGraph files to bigWig files
+bedGraphToBigWig data/bedGraphs/ENCSR000BSE_control_plus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BSE_control_plus.bw
+    
+bedGraphToBigWig data/bedGraphs/ENCSR000BSE_control_minus.bedGraph \
+    ~/reference/GRCh38_EBV.chrom.sizes data/bigWigs/ENCSR000BSE_control_minus.bw
