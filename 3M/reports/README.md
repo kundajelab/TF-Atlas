@@ -33,6 +33,19 @@ This notebook requires:
 		`hyp_scores`: N x L x 4 array of hypothetical importance scores
 		`input_seqs`: N x L x 4 array of one-hot encoded input sequences
 
+- Set of all peaks as ENCODE NarrowPeak format (used for distance distribution of seqlets to peak summits)
+
 Note that the N sequences in the importance scores must be precisely those that TF-MoDISco was run on (in the exact order). N is the number of peaks, T is the number of tasks (for single task models, that is just 1), O is the output profile length (e.g. 1000bp), L is the input sequence length (e.g. 2114bp), and 2 is for the two strands.
 
 We also assume that TF-MoDISco wsa run only on the central 400bp of the importance scores.
+
+### `showcase_motifs_and_profiles.ipynb`
+For each TF-MoDISco motif, visualizes a sample of:
+- Predicted/observed profile of that sequence
+- Importance scores for that sequence
+- The underlying seqlet
+
+This notebook requires:
+- TF-MoDISco result HDF5
+- Peak predictions HDF5 (same format as above)
+- Importance scores HDF5 (same format as above)
