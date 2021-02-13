@@ -1,2 +1,4 @@
 .ipynb_*
 __pycache__
+
+*.swp
