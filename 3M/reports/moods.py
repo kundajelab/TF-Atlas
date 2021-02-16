@@ -48,6 +48,7 @@ def moods_hits_to_bed(moods_out_csv_path, moods_out_bed_path):
     """
     f = open(moods_out_csv_path, "r")
     g = open(moods_out_bed_path, "w")
+    warn = True
     for line in f:
         tokens = line.split(",")
         try:
@@ -58,8 +59,10 @@ def moods_hits_to_bed(moods_out_csv_path, moods_out_bed_path):
                 tokens[4]
             ]) + "\n")
         except ValueError:
-            # If a line is formatted incorrectly, skip it
-            print("Bad line: " + line)
+            # If a line is formatted incorrectly, skip it and warn once
+            if warn:
+                print("Found bad line: " + line)
+                warn = False
             pass
         # Note: depending on the Fasta file and version of MOODS, only keep the
         # first token of the "chromosome"

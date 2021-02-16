@@ -49,3 +49,19 @@ This notebook requires:
 - TF-MoDISco result HDF5
 - Peak predictions HDF5 (same format as above)
 - Importance scores HDF5 (same format as above)
+
+### `summarize_motif_hits.ipynb`
+For the set of TF-MoDISco motifs, this notebook will run MOODS motif instance calling and analyze the resulting hits. This notebook will visualize:
+- The distribution of how many motif hits are found per peak
+- The proportion of peaks that have each type of motif
+- Example importance score tracks with highlighted motif hits
+- Co-occurrence of different motifs in peaks
+- Homotypic motif densities in peaks
+- Distribution of distances between strongly co-occurring motifs
+
+This notebook requires:
+- TF-MoDISco result HDF5
+- Importance scores HDF5 (same format as above)
+- Set of all peaks as ENCODE NarrowPeak format
+
+MOODS calling is performed by `moods.py`. When executed, the notebook can be configured to save the MOODS hit results in a specified location.
