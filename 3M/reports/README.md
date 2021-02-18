@@ -65,3 +65,14 @@ This notebook requires:
 - Set of all peaks as ENCODE NarrowPeak format
 
 MOODS calling is performed by `moods.py`. When executed, the notebook can be configured to save the MOODS hit results in a specified location.
+
+### `model_performance.ipynb`
+Plots the profile and counts performance of a model, including:
+- CDFs of profile performance metrics over peaks (MNLL, cross entropy, and JSD are min-max-normalized)
+- Scatter plot of predicted and true log counts, and their correlation
+
+This notebook requires:
+- Peak predictions HDF5 (same format as above)
+- Path to metrics directory:
+	- This directory must contain the subdirectories `plus/` and `minus/`, each with NumPy arrays of `{key}.npz` for each metric key
+	- Any min-max-normalization must have already happened prior to saving these vectors
