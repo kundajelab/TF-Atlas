@@ -63,8 +63,22 @@ This notebook requires:
 - TF-MoDISco result HDF5
 - Importance scores HDF5 (same format as above)
 - Set of all peaks as ENCODE NarrowPeak format
+- A location to store the MOODS results
 
-MOODS calling is performed by `moods.py`. When executed, the notebook can be configured to save the MOODS hit results in a specified location.
+MOODS calling is performed by `moods.py`.
+
+### `cluster_motif_hits_and_peaks.ipynb`
+From the set of TF-MoDISco motifs and the motif hits in peaks, this notebook will visualize:
+- Subclustering structure within motifs themselves
+- Clustering of peak embeddings based on which peaks contain which motifs
+
+This notebook requires:
+- TF-MoDISco result HDF5
+- Importance scores HDF5 (same format as above)
+- Location where MOODS results were stored
+- Embeddings of peaks as an N x L x F array
+	- N is the number of peaks, L is the length along the final dilated convolutional axis, and F is the number of filters
+	- The peaks N must be in the same order as in the peaks BED file which was used to compute motif hits
 
 ### `model_performance.ipynb`
 Plots the profile and counts performance of a model, including:

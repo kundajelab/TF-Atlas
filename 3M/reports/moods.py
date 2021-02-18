@@ -76,21 +76,48 @@ def filter_hits_for_peaks(
     """
     Filters MOODS hits for only those that overlap a particular set of peaks.
     `peak_bed_path` must be a BED file; only the first 3 columns are used.
+    A new column is added to the resulting hits: the index of the peak in
+    `peak_bed_path`. If `peak_bed_path` has repeats, the later index is kept.
     """
+    # First filter using bedtools intersect, keeping track of matches
+    temp_file = filtered_hits_path + ".tmp"
     comm = ["bedtools", "intersect"]
-    comm += ["-wa"]
+    comm += ["-wa", "-wb"]
     comm += ["-a", moods_out_bed_path]
     comm += ["-b", peak_bed_path]
-    with open(filtered_hits_path, "w") as f:
+    with open(temp_file, "w") as f:
         proc = subprocess.Popen(comm, stdout=f)
         proc.wait()
+
+    # Create mapping of peaks to indices in `peak_bed_path`
+    peak_table = pd.read_csv(
+        peak_bed_path, sep="\t", header=None, index_col=False,
+        usecols=[0, 1, 2], names=["chrom", "start", "end"]
+    )
+    peak_keys = (
+        peak_table["chrom"] + ":" + peak_table["start"].astype(str) + "-" + \
+        peak_table["end"].astype(str)
+    ).values
+    peak_index_map = {k : str(i) for i, k in enumerate(peak_keys)}
+
+    # Convert last three columns to peak index
+    f = open(temp_file, "r")
+    g = open(filtered_hits_path, "w")
+    for line in f:
+        tokens = line.strip().split("\t")
+        g.write("\t".join((tokens[:-3])))
+        peak_index = peak_index_map["%s:%s-%s" % tuple(tokens[-3:])]
+        g.write("\t" + peak_index + "\n")
+    f.close()
+    g.close()
 
 
 def collapse_hits(filtered_hits_path, collapsed_hits_path, pfm_keys):
     """
     Collapses hits by merging instances of the same motif that overlap.
     """
-    # For each PFM key, merge all its hits, collapsing strand and score
+    # For each PFM key, merge all its hits, collapsing strand, score, and peak
+    # index
     temp_file = collapsed_hits_path + ".tmp"
     f = open(temp_file, "w")  # Clear out the file
     f.close()
@@ -101,7 +128,7 @@ def collapse_hits(filtered_hits_path, collapsed_hits_path, pfm_keys):
             comm += ["|", "bedtools", "sort"]
             comm += [
                 "|", "bedtools", "merge",
-                "-c", "4,5,6", "-o", "distinct,collapse,collapse"
+                "-c", "4,5,6,7", "-o", "distinct,collapse,collapse,collapse"
             ]
             proc = subprocess.Popen(" ".join(comm), shell=True, stdout=f)
             proc.wait()
@@ -116,7 +143,8 @@ def collapse_hits(filtered_hits_path, collapsed_hits_path, pfm_keys):
             scores = [float(x) for x in tokens[5].split(",")]
             i = np.argmax(scores)
             g.write(
-                "\t" + tokens[4].split(",")[i] + "\t" + str(scores[i]) + "\n"
+                "\t" + tokens[4].split(",")[i] + "\t" + str(scores[i]) + \
+                "\t" + tokens[6].split(",")[i] + "\n"
             )
         else:
             g.write(line)
@@ -130,13 +158,13 @@ def import_moods_hits(hits_bed):
     Imports the MOODS hits as a single Pandas DataFrame. `pfm_lengths` is a
     dictionary mapping PFM key to PFM length.
     Returns a Pandas DataFrame with the columns: chrom, start, end, key, strand,
-    score.
+    score, peak_index.
     `key` is the name of the originating PFM, and `length` is its length.
     """
     # Create dictionary mapping PFM key to length
     hit_table = pd.read_csv(
         hits_bed, sep="\t", header=None, index_col=False,
-        names=["chrom", "start", "end", "key", "strand", "score"]
+        names=["chrom", "start", "end", "key", "strand", "score", "peak_index"]
     )
     return hit_table
 
