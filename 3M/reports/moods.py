@@ -75,6 +75,7 @@ def filter_hits_for_peaks(
 ):
     """
     Filters MOODS hits for only those that overlap a particular set of peaks.
+    `peak_bed_path` must be a BED file; only the first 3 columns are used.
     """
     comm = ["bedtools", "intersect"]
     comm += ["-wa"]
@@ -163,7 +164,8 @@ def test_moods_hits(
 
 
 def get_moods_hits(
-    pfm_dict, reference_fasta, peak_bed_path, pval_thresh=0.0001, temp_dir=None
+    pfm_dict, reference_fasta, peak_bed_path, expand_peak_length=None,
+    pval_thresh=0.0001, temp_dir=None
 ):
     """
     From a dictionary of PFMs, runs MOODS and returns the result as a Pandas
@@ -173,7 +175,9 @@ def get_moods_hits(
             different for each PFM); the key will be the name of each motif
         `reference_fasta`: path to reference Fasta to use
         `peak_bed_path`: path to peaks BED file; only keeps MOODS hits from
-            these intervals
+            these intervals; must be in NarrowPeak format
+        `expand_peak_length`: if given, expand the peaks (centered at summits)
+            to this length
         `pval_thresh`: threshold p-value for MOODS to use
         `temp_dir`: a temporary directory to store intermediates; defaults to
             a randomly created directory
@@ -198,6 +202,23 @@ def get_moods_hits(
         os.path.join(temp_dir, "moods_out.csv"),
         os.path.join(temp_dir, "moods_out.bed")
     )
+
+    # If needed, expand peaks to given length
+    if expand_peak_length:
+        peaks_table = pd.read_csv(
+            peak_bed_path, sep="\t", header=None, index_col=False,
+            usecols=[0, 1, 2, 9],
+            names=["chrom", "start", "end", "summit_offset"]
+        )
+        peaks_table["start"] = \
+            (peaks_table["start"] + peaks_table["summit_offset"]) - \
+            (expand_peak_length // 2)
+        peaks_table["end"] = peaks_table["start"] + expand_peak_length
+        peaks_table[["chrom", "start", "end"]].to_csv(
+            os.path.join(temp_dir, "peaks_expanded.bed"), sep="\t",
+            header=False, index=False
+        )
+        peak_bed_path = os.path.join(temp_dir, "peaks_expanded.bed")
     
     # Filter hits for those that overlap peaks
     filter_hits_for_peaks(
