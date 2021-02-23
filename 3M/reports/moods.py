@@ -175,9 +175,9 @@ def compute_hits_importance_pval(
     Each of the DeepSHAP score HDF5s must be of the form:
         `coords_chrom`: N-array of chromosome (string)
         `coords_start`: N-array
-	`coords_end`: N-array
-	`hyp_scores`: N x L x 4 array of hypothetical importance scores
-	`input_seqs`: N x L x 4 array of one-hot encoded input sequences
+        `coords_end`: N-array
+        `hyp_scores`: N x L x 4 array of hypothetical importance scores
+        `input_seqs`: N x L x 4 array of one-hot encoded input sequences
     Outputs an identical hit BED with an extra column for the importance-score-
     based p-value.
     """
@@ -211,21 +211,35 @@ def compute_hits_importance_pval(
     merged_hits["motif_rel_end"] = \
         merged_hits["end"] - merged_hits["peak_start"]
 
+    # Careful! Because of the merging step that only kept the top peak hit, some
+    # hits might overrun the edge of the peak; we limit the motif hit indices
+    # here so they stay in the peak; this should not be a common occurrence
+    merged_hits["peak_min"] = 0
+    merged_hits["peak_max"] = \
+        merged_hits["peak_end"] - merged_hits["peak_start"]
+    merged_hits["motif_rel_start"] = \
+        merged_hits[["motif_rel_start", "peak_min"]].max(axis=1)
+    merged_hits["motif_rel_end"] = \
+        merged_hits[["motif_rel_end", "peak_max"]].min(axis=1)
+    del merged_hits["peak_min"]
+    del merged_hits["peak_max"]
+
     # Get score of each motif hit as average importance over the hit
-    scores = []
-    for _, row in merged_hits.iterrows():
-        scores.append(np.mean(
+    scores = np.empty(len(merged_hits))
+    for i, row in merged_hits.iterrows():
+        scores[i] = np.mean(
             imp_scores[row["peak_index"]][
                 row["motif_rel_start"]:row["motif_rel_end"]
             ]
-        ))
-    scores = np.array(scores)
+        )
 
     # Get distribution of null scores over all bases
     null_scores = np.sort(np.ravel(null_imp_scores))
 
     # Compute p-value of each score
     search_inds = np.searchsorted(null_scores, scores)
+    # Insertion point of ties is on the left; this means that if a null score
+    # ties with a hit score, that does not make the p-value smaller
     pvals = 1 - (search_inds / len(null_scores))
     
     merged_hits["imp_pval"] = pvals
