@@ -43,6 +43,9 @@ COPY requirements.txt /scratch
 RUN pip install -r requirements.txt
 RUN rm requirements.txt
 
+# Install jq
+RUN apt-get install -y jq
+
 # Set environment variables for Python
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
