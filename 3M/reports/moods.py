@@ -205,6 +205,10 @@ def compute_hits_importance_pval(
         hit_table, peak_table, left_on="peak_index", right_index=True
     )
 
+    # Important! Reset the indices of `merged_hits` after merging, otherwise
+    # iteration over the rows won't be in order
+    merged_hits = merged_hits.reset_index(drop=True)
+
     # Compute start and end of each motif relative to the peak
     merged_hits["motif_rel_start"] = \
         merged_hits["start"] - merged_hits["peak_start"]
