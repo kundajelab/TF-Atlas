@@ -3,7 +3,6 @@ import subprocess
 import numpy as np
 import pandas as pd
 import tempfile
-import tqdm
 import util
 
 def export_motifs(pfms, out_dir):
@@ -155,20 +154,17 @@ def collapse_hits(filtered_hits_path, collapsed_hits_path, pfm_keys):
     g.close()
 
 
-def compute_hits_importance_pval(
-    hits_bed_path, shap_scores_hdf5_path, null_shap_scores_hdf5_path,
-    peak_bed_path, out_path
+def compute_hits_importance_scores(
+    hits_bed_path, shap_scores_hdf5_path, peak_bed_path, out_path
 ):
     """
-    Filters MOODS hits for only significant hits based on importance score
-    thresholding.
+    For each MOODS hit, computes the hit's importance score as the ratio of the
+    hit's average importance score to the total importance of the sequence.
     Arguments:
         `hits_bed_path`: path to BED file output by `collapse_hits`
             without the p-value column
         `shap_scores_hdf5_path`: an HDF5 of DeepSHAP scores of peak regions
             measuring importance
-        `null_shap_scores_hdf5_path`: an HDF5 of null DeepSHAP scores of peak
-            regions measuring importance
         `peak_bed_path`: BED file of peaks; we require that these coordinates
             must match the DeepSHAP score coordinates exactly
         `out_path`: path to output the resulting table
@@ -178,17 +174,12 @@ def compute_hits_importance_pval(
         `coords_end`: N-array
         `hyp_scores`: N x L x 4 array of hypothetical importance scores
         `input_seqs`: N x L x 4 array of one-hot encoded input sequences
-    Outputs an identical hit BED with an extra column for the importance-score-
-    based p-value.
+    Outputs an identical hit BED with an extra column for the importance score
+    fraction.
     """
     _, imp_scores, _, coords = util.import_shap_scores(
         shap_scores_hdf5_path, "hyp_scores", remove_non_acgt=False
     )
-    _, null_imp_scores, _, null_coords = util.import_shap_scores(
-        null_shap_scores_hdf5_path, "hyp_scores", remove_non_acgt=False
-    )
-    assert np.all(coords == null_coords)
-
     peak_table = pd.read_csv(
         peak_bed_path, sep="\t", header=None, index_col=False,
         usecols=[0, 1, 2], names=["peak_chrom", "peak_start", "peak_end"]
@@ -228,28 +219,22 @@ def compute_hits_importance_pval(
     del merged_hits["peak_min"]
     del merged_hits["peak_max"]
 
-    # Get score of each motif hit as average importance over the hit
+    # Get score of each motif hit as average importance over the hit, divided
+    # by the total score of the sequence
     scores = np.empty(len(merged_hits))
-    for i, row in merged_hits.iterrows():
-        scores[i] = np.mean(
-            imp_scores[row["peak_index"]][
-                row["motif_rel_start"]:row["motif_rel_end"]
-            ]
-        )
+    for peak_index, group in merged_hits.groupby("peak_index"):
+        # Iterate over grouped table by peak
+        score_track = np.sum(np.abs(imp_scores[peak_index]), axis=1)
+        total_score = np.sum(score_track)
+        for i, row in group.iterrows():
+            scores[i] = np.mean(
+                    score_track[row["motif_rel_start"]:row["motif_rel_end"]]
+            ) / total_score
 
-    # Get distribution of null scores over all bases
-    null_scores = np.sort(np.ravel(null_imp_scores))
-
-    # Compute p-value of each score
-    search_inds = np.searchsorted(null_scores, scores)
-    # Insertion point of ties is on the left; this means that if a null score
-    # ties with a hit score, that does not make the p-value smaller
-    pvals = 1 - (search_inds / len(null_scores))
-    
-    merged_hits["imp_pval"] = pvals
+    merged_hits["imp_frac_score"] = scores
     new_hit_table = merged_hits[[
         "chrom", "start", "end", "key", "strand", "score", "peak_index",
-        "imp_pval"
+        "imp_frac_score"
     ]]
     new_hit_table.to_csv(out_path, sep="\t", header=False, index=False)
 
@@ -258,14 +243,14 @@ def import_moods_hits(hits_bed):
     """
     Imports the MOODS hits as a single Pandas DataFrame.
     Returns a Pandas DataFrame with the columns: chrom, start, end, key, strand,
-    score, peak_index, imp_pval
+    score, peak_index, imp_frac_score
     `key` is the name of the originating PFM, and `length` is its length.
     """
     hit_table = pd.read_csv(
         hits_bed, sep="\t", header=None, index_col=False,
         names=[
             "chrom", "start", "end", "key", "strand", "score", "peak_index",
-            "imp_pval"
+            "imp_frac_score"
         ]
     )
     return hit_table
@@ -273,8 +258,7 @@ def import_moods_hits(hits_bed):
 
 def get_moods_hits(
     pfm_dict, reference_fasta, peak_bed_path, shap_scores_hdf5_path,
-    null_shap_scores_hdf5_path, expand_peak_length=None,
-    moods_pval_thresh=0.0001, temp_dir=None
+    expand_peak_length=None, moods_pval_thresh=0.0001, temp_dir=None
 ):
     """
     From a dictionary of PFMs, runs MOODS and returns the result as a Pandas
@@ -287,8 +271,6 @@ def get_moods_hits(
             these intervals; must be in NarrowPeak format
         `shap_scores_hdf5_path`: an HDF5 of DeepSHAP scores of peak regions
             measuring importance
-        `null_shap_scores_hdf5_path`: an HDF5 of null DeepSHAP scores of peak
-            regions measuring importance
         `peak_bed_path`: BED file of peaks; we require that these coordinates
             must match the DeepSHAP score coordinates exactly
         `expand_peak_length`: if given, expand the peaks (centered at summits)
@@ -357,14 +339,14 @@ def get_moods_hits(
         pfm_keys
     )
 
-    compute_hits_importance_pval(
+    compute_hits_importance_scores(
         os.path.join(temp_dir, "moods_filtered_collapsed.bed"),
-        shap_scores_hdf5_path, null_shap_scores_hdf5_path, peak_bed_path,
-        os.path.join(temp_dir, "moods_filtered_collapsed_tested.bed")
+        shap_scores_hdf5_path, peak_bed_path,
+        os.path.join(temp_dir, "moods_filtered_collapsed_scored.bed")
     )
 
     hit_table = import_moods_hits(
-        os.path.join(temp_dir, "moods_filtered_collapsed_tested.bed")
+        os.path.join(temp_dir, "moods_filtered_collapsed_scored.bed")
     )
 
     if temp_dir_obj is not None:
