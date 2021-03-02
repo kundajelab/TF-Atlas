@@ -1,0 +1,19 @@
+{
+    "experiment": "ENCSR725VFL",
+    "assembly": "GRCh38",
+    "unfiltered_alignments": "ENCFF677CLR ENCFF617QJF",
+    "unfiltered_alignments_md5sums": "ddec02079476f6bc0fca4a9ec0b23582 bae83e3e12494700d52b0f9db6e45c5e",
+    "alignments": "ENCFF781YRX ENCFF275DGB",
+    "alignments_md5sums": "e780fcf595c963ed40e0797b63ebff06 e0735e40b2e96801d0aa16fec9e42807",
+    "control_unfiltered_alignments": "ENCFF054FPS ENCFF498BOQ",
+    "control_unfiltered_alignments_md5sums": "a5b4e44d5f68bb0872aba00260b0e5e1 488dbc9126e2da1738e8e3aa93745d2f",
+    "control_alignments": "ENCFF377KFK ENCFF232AKP",
+    "control_alignments_md5sums": "e0e41bd5e51cc92d0a700944fe289393 c5461dc1bbb542d74e0c676ac42e2bbb",
+    "peaks": "ENCFF154RAJ",
+    "peaks_md5sum": "c46c6f68563dc5b4200fa4a65c3178bb",
+    "has_control": "True",
+    "stranded": "True",
+    "encode_access_key": "HBZNC72F",
+    "encode_secret_key": "dxjvsz3pfvnaqoxw",
+    "gcp_bucket": "gbsc-gcp-lab-kundaje-tf-atlas"
+}
