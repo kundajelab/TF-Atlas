@@ -21,10 +21,10 @@ function wait_for_jobs_to_finish {
     for job in `jobs -p`
     do
         all_jobs+=( $job )
-        echo $( timestamp ): [$job] Waiting for $job_description to finish... \
-        | tee -a $logfile
+        echo $( timestamp ): [$job] Waiting for $job_description to \
+        finish... | tee -a $logfile
     done
-    echo $( timestamp ): Pending jobs "-" ${all_jobs[*]}
+    echo $( timestamp ): Pending jobs "-" ${all_jobs[*]} | tee -a $logfile
     
     FAIL=0
     for job in `jobs -p`

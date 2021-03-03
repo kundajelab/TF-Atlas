@@ -60,19 +60,19 @@ touch $logfile
 
 # create local reference directory
 reference_dir="reference"
-echo $( timestamp )": mkdir ${reference_dir}" | tee -a $logfile
+echo $( timestamp ): "mkdir" $reference_dir | tee -a $logfile
 mkdir $reference_dir
 
 # Step 1. Download the reference files from gcp based on assembly
-echo $( timestamp ): gsutil -m cp gs://$gcp_bucket/reference/${assembly}/* \
-${reference_dir}/ | tee -a $logfile
+echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/$assembly/* \
+$reference_dir/ | tee -a $logfile
 gsutil -m cp gs://$gcp_bucket/reference/$assembly/* $reference_dir/
 
 # Step 2. download bam files and peaks file
 
 # directory to store downloaded files
 downloads_dir="downloads"
-echo $( timestamp )": mkdir ${downloads_dir}" | tee -a $logfile
+echo $( timestamp ): "mkdir" $downloads_dir | tee -a $logfile
 mkdir $downloads_dir
 
 # 2.1 download unfiltered alignments bams
@@ -106,12 +106,12 @@ wait_for_jobs_to_finish "Download"
 
 # create a new directory to store intermediate files
 intermediates_dir=intermediates
-echo $( timestamp ):" mkdir ${intermediates_dir}" | tee -a $logfile
+echo $( timestamp ): "mkdir" $intermediates_dir | tee -a $logfile
 mkdir $intermediates_dir
 
 # create a new directory to store bigWigs
 bigWigs_dir=bigWigs
-echo $( timestamp ):" mkdir ${bigWigs_dir}" | tee -a $logfile
+echo $( timestamp ): "mkdir" $bigWigs_dir | tee -a $logfile
 mkdir $bigWigs_dir
 
 # 3.1 preprocess experiment bams
@@ -121,20 +121,20 @@ $logfile &
 
 echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
 \"$unfiltered_alignments\" \"$alignments\" $downloads_dir $intermediates_dir \
-$bigWigs_dir $stranded False $reference_dir $logfile 
+$bigWigs_dir $stranded False $reference_dir $logfile  | tee -a $logfile
 
 
 if [ "$has_control" = "True" ]
 then
     # 3.2 preprocess experiment control bams
-
     ./preprocessing.sh $experiment "$control_unfiltered_alignments" \
     "$control_alignments" $downloads_dir $intermediates_dir $bigWigs_dir \
     $stranded True $reference_dir $logfile &
     
     echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
     \"$control_unfiltered_alignments\" \"$control_alignments\" $downloads_dir \
-    $intermediates_dir $bigWigs_dir $stranded True $reference_dir $logfile
+    $intermediates_dir $bigWigs_dir $stranded True $reference_dir $logfile | \
+    tee -a $logfile
 
 fi
 

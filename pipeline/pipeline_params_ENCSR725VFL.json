@@ -13,7 +13,5 @@
     "peaks_md5sum": "c46c6f68563dc5b4200fa4a65c3178bb",
     "has_control": "True",
     "stranded": "True",
-    "encode_access_key": "HBZNC72F",
-    "encode_secret_key": "dxjvsz3pfvnaqoxw",
     "gcp_bucket": "gbsc-gcp-lab-kundaje-tf-atlas"
 }
