@@ -46,6 +46,15 @@ has_control=`jq .has_control $pipeline_json | sed 's/"//g'`
 
 stranded=`jq .stranded $pipeline_json | sed 's/"//g'`
 
+model_arch_name=`jq .model_arch_name $pipeline_json | sed 's/"//g'`
+
+sequence_generator_name=\
+`jq .sequence_generator_name $pipeline_json | sed 's/"//g'`
+
+splits_json_path=`jq .splits_json_path $pipeline_json | sed 's/"//g'`
+
+test_chroms=`jq .test_chroms $pipeline_json | sed 's/"//g'`
+
 gcp_bucket=`jq .gcp_bucket $pipeline_json | sed 's/"//g'`
 
 encode_access_key=$2
@@ -56,9 +65,9 @@ encode_secret_key=$3
 logfile=$experiment.log
 touch $logfile
 
-# Step 1. download reference files from gcp
+# # Step 1. download reference files from gcp
 
-# create local reference directory
+# # create local reference directory
 reference_dir="reference"
 echo $( timestamp ): "mkdir" $reference_dir | tee -a $logfile
 mkdir $reference_dir
@@ -67,6 +76,10 @@ mkdir $reference_dir
 echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/$assembly/* \
 $reference_dir/ | tee -a $logfile
 gsutil -m cp gs://$gcp_bucket/reference/$assembly/* $reference_dir/
+
+# Step 1.1 create index for the fasta file
+echo $( timestamp ): "samtools faidx" reference/genome.fa  | tee -a $logfile
+samtools faidx reference/genome.fa
 
 # Step 2. download bam files and peaks file
 
@@ -140,6 +153,74 @@ fi
 
 wait_for_jobs_to_finish "Preprocessing"
 
-# Step 3. Run 3M
+# Step pre_4:
+echo $( timestamp ): "python create_input_json.py" $experiment $peaks True \
+True $bigWigs_dir $downloads_dir . | tee -a $logfile
 
-# Step 4. reports
+python create_input_json.py $experiment $peaks True True $bigWigs_dir \
+$downloads_dir .
+    
+# Step 4. Run 3M
+
+# Step 4.1 Modeling
+model_dir=model
+echo $( timestamp ): "mkdir" $model_dir
+mkdir $model_dir
+
+predictions_dir=predictions
+echo $( timestamp ): "mkdir" $predictions_dir | tee -a $logfile
+mkdir $predictions_dir
+
+embeddings_dir=embeddings
+echo $( timestamp ): "mkdir" $embeddings_dir | tee -a $logfile
+mkdir $embeddings_dir
+
+echo $( timestamp ): "./modeling.sh" $experiment $model_arch_name \
+$sequence_generator_name $splits_json_path $reference_dir $model_dir \
+$predictions_dir $embeddings_dir $logfile | tee -a $logfile
+
+./modeling.sh $experiment $model_arch_name $sequence_generator_name \
+$splits_json_path $reference_dir $model_dir $predictions_dir \
+$embeddings_dir $logfile
+
+# Step 4.3 Metrics
+
+echo $( timestamp ): "./metrics.sh" $experiment $downloads_dir $reference_dir \
+$predictions_dir $peaks $test_chroms $logfile | tee -a $logfile
+
+./metrics.sh $experiment $downloads_dir $reference_dir $predictions_dir \
+$peaks $test_chroms $logfile
+
+# Step 4.3 Modisco
+
+# create shap directory
+shap_dir=shap
+echo $( timestamp ): "mkdir" $shap_dir | tee -a $logfile
+mkdir $shap_dir
+
+# create modisco dir
+modisco_dir=modisco
+echo $( timestamp ): "mkdir" $modisco_dir | tee -a $logfile
+mkdir $modisco_dir
+
+# create subdirectory for modisco on profile shap scores
+modisco_profile_dir=$modisco_dir/profile
+echo $( timestamp ): "mkdir" $modisco_profile_dir | tee -a $logfile
+mkdir $modisco_profile_dir
+
+# create subdirectory for modisco on counts shap scores
+modisco_counts_dir=$modisco_dir/counts
+echo $( timestamp ): "mkdir" $modisco_counts_dir | tee -a $logfile
+mkdir $modisco_counts_dir
+
+# run shap followed by modisco
+echo $( timestamp ): "./modisco.sh" $experiment $reference_dir $downloads_dir \
+$model_dir $peaks $shap_dir $modisco_profile_dir $modisco_counts_dir \
+$logfile | tee -a $logfile
+
+./modisco.sh $experiment $reference_dir $downloads_dir $model_dir $peaks \
+$shap_dir $modisco_profile_dir $modisco_counts_dir $logfile
+
+#Step 5. reports
+
+echo $( timestamp ): Done. | tee -a $logfile

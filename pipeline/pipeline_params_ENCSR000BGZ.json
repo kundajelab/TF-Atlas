@@ -13,5 +13,9 @@
     "peaks_md5sum": "341da336fa69b2964c41458250111dbd",
     "has_control": "True",
     "stranded": "True",
+    "model_arch_name": "BPNet1000d8",
+    "sequence_generator_name": "BPNet",
+    "splits_json_path": "one_split.json",
+    "test_chroms": "chr1",
     "gcp_bucket": "gbsc-gcp-lab-kundaje-tf-atlas"
 }

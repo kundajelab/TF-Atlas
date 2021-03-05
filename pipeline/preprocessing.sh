@@ -138,19 +138,19 @@ then
 
     # Convert bedGraph files to bigWig files 
     ~/./bedGraphToBigWig $intermediates_dir/$experiment${tag}_plus.bedGraph \
-    $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_plus.bw &
+    $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_plus.bigWig &
     
     echo $( timestamp ): [$!] "~/./bedGraphToBigWig" \
     $intermediates_dir/$experiment${tag}_plus.bedGraph \
-    $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_plus.bw | \
+    $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_plus.bigWig | \
     tee -a $logfile
 
     ~/./bedGraphToBigWig $intermediates_dir/$experiment${tag}_minus.bedGraph \
-    $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_minus.bw &
+    $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_minus.bigWig &
  
     echo $( timestamp ): [$!] "~/./bedGraphToBigWig" \
     $intermediates_dir/$experiment${tag}_minus.bedGraph \
-    $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_minus.bw | \
+    $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_minus.bigWig | \
     tee -a $logfile
 
     wait_for_jobs_to_finish "bedGraphToBigWig"
@@ -158,18 +158,18 @@ else
     # get coverage of 5’ positions
     echo $( timestamp ): "bedtools genomecov" \
     "-5 -bg -ibam" $intermediates_dir/$experiment$tag.bam "|" \
-    "sort -k1,1 -k2,2n >" $intermediates_dir/$experiment${tag}.bedGraph | \
+    "sort -k1,1 -k2,2n >" $intermediates_dir/$experiment$tag.bedGraph | \
     tee -a $logfile
     
     bedtools genomecov \
     -5 -bg -ibam $intermediates_dir/$experiment$tag.bam | \
-    sort -k1,1 -k2,2n > $intermediates_dir/$experiment${tag}.bedGraph
+    sort -k1,1 -k2,2n > $intermediates_dir/$experiment$tag.bedGraph
 
-    echo $( timestamp ): "~/./bedGraphToBigWig "\
-    "$intermediates_dir/$experiment${tag}_plus.bedGraph"\
-    "$reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}.bw" \
+    echo $( timestamp ): "~/./bedGraphToBigWig" \
+    $intermediates_dir/$experiment${tag}.bedGraph \
+    $reference_dir/chrom.sizes $bigWigs_dir/$experiment$tag.bigWig \
     | tee -a $logfile
     
-    ~/./bedGraphToBigWig $intermediates_dir/$experiment${tag}.bedGraph \
-    $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}.bw
+    ~/./bedGraphToBigWig $intermediates_dir/$experiment$tag.bedGraph \
+    $reference_dir/chrom.sizes $bigWigs_dir/$experiment$tag.bigWig
 fi
