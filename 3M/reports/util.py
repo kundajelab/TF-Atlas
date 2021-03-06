@@ -173,6 +173,27 @@ def pfm_to_pwm(pfm):
     return pfm * np.expand_dims(ic, axis=1)
 
 
+def trim_motif(pfm, motif, min_ic=0.2, pad=0):
+    """
+    Given the PFM and motif (both L x 4 arrays) (the motif could be the
+    PFM itself), trims `motif` by cutting off flanks of low information
+    content in `pfm`. `min_ic` is the minimum required information
+    content. If specified this trimmed motif will be extended on either
+    side by `pad` bases.
+    If no base passes the `min_ic` threshold, then no trimming is done.
+    """
+    # Trim motif based on information content
+    ic = info_content(pfm)
+    pass_inds = np.where(ic >= min_ic)[0]  # Cut off flanks with less than min_ic IC
+    
+    if not pass_inds.size:
+        return motif
+
+    # Expand trimming to +/- pad bp on either side
+    start, end = max(0, np.min(pass_inds) - pad), min(len(pfm), np.max(pass_inds) + pad + 1)
+    return motif[start:end]
+
+
 def figure_to_vdom_image(figure):
     buf = io.BytesIO()
     figure.savefig(buf, format='png')
