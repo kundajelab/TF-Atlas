@@ -6,7 +6,6 @@ import tempfile
 
 BACKGROUND_FREQS = np.array([0.25, 0.25, 0.25, 0.25])
 DATABASE_PATH = "/users/amtseng/tfmodisco/data/processed/motif_databases/HOCOMOCO_JASPAR_motifs.txt"
-DATABASE_PFMS = None
 
 def import_database_pfms(database_path):
     """
@@ -162,7 +161,8 @@ def match_motifs_to_targets(
         
 
 def match_motifs_to_database(
-    query_pfms, top_k=5, temp_dir=None, show_tomtom_output=False
+    query_pfms, top_k=5, temp_dir=None, database_path=DATABASE_PATH,
+    show_tomtom_output=False
 ):
     """
     For each motif in the query PFMs, finds the best matches to the TOMTOM
@@ -172,6 +172,8 @@ def match_motifs_to_database(
         `top_k`: the number of motifs to return based on q-value
         `temp_dir`: a temporary directory to store intermediates; defaults to
             a randomly created directory
+        `database_path`: the path to a TOMTOM motif database; defaults to
+            DATABASE_PATH
         `show_tomtom_output`: whether to show TOMTOM output when running
     Returns a list of lists of (motif name, motif PFM, q-value) tuples
     parallel to `query_pfms`, where each sublist of tuples is the set of motif
@@ -180,11 +182,8 @@ def match_motifs_to_database(
     than `top_k` matches are found (based on TOMTOM's threshold), the returned
     sublist will be shorter (and may even be empty).
     """
-    # First make sure we have imported the database PFMs
-    global DATABASE_PFMS
-    if DATABASE_PFMS is None:
-        DATABASE_PFMS = import_database_pfms(DATABASE_PATH)
-
+    # First, import the database PFMs
+    database_pfms = import_database_pfms(database_path)
 
     if temp_dir is None:
         temp_dir_obj = tempfile.TemporaryDirectory()
@@ -199,7 +198,7 @@ def match_motifs_to_database(
     # Run TOMTOM
     tomtom_dir = os.path.join(temp_dir, "tomtom")
     run_tomtom(
-        query_motif_file, DATABASE_PATH, tomtom_dir,
+        query_motif_file, database_path, tomtom_dir,
         show_output=show_tomtom_output
     )
 
@@ -215,7 +214,7 @@ def match_motifs_to_database(
         rows = rows.sort_values("q-value").head(top_k)
         tups = list(zip(rows["Target_ID"], rows["q-value"]))
         tups = [
-            (tup[0], DATABASE_PFMS[tup[0]], tup[1]) for tup in tups
+            (tup[0], database_pfms[tup[0]], tup[1]) for tup in tups
         ]
         matches.append(tups)
 
