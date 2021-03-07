@@ -1,2 +1,4 @@
 jupyter==1.0.0
 vdom==0.6
+umap-learn
+pomegranate==0.12.0
