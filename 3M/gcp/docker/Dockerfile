@@ -35,8 +35,18 @@ RUN pip install --no-cache-dir --ignore-installed git+https://github.com/kundaje
 # Copy down the TF-Atlas scripts
 RUN git clone https://github.com/kundajelab/TF-Atlas.git
 
-# Install SAMtools, BEDtools, MEME, MOODS, and UCSC BedGraphToBigWig
-RUN conda install -y -c bioconda samtools bedtools meme moods ucsc-bedgraphtobigwig 
+# Install a specific version of MEME
+RUN wget https://meme-suite.org/meme/meme-software/5.0.1/meme_5.0.1.tar.gz && \
+	tar xzf meme_5.0.1.tar.gz && \
+	cd meme-5.0.1 && \
+    ./configure --prefix=/opt/meme --enable-build-libxml2 --enable-build-libxslt && \
+    make && \
+    make install
+ENV PATH "$PATH:/opt/meme/bin/"
+RUN rm -rf meme*
+
+# Install SAMtools, BEDtools, MOODS, and UCSC BedGraphToBigWig
+RUN conda install -y -c bioconda samtools bedtools moods ucsc-bedgraphtobigwig 
 
 # Install any remaining needed Python packages specified in requirements.txt
 COPY requirements.txt /scratch
