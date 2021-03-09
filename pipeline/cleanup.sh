@@ -14,4 +14,7 @@ rm -rf embeddings/
 rm -rf shap/
 rm -rf modisco/
 rm -rf figures/
+rm -rf reports_output/
+rm -rf tomtom/
+rm -rf motif_databases/
 

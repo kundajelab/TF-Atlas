@@ -6,11 +6,13 @@ experiment=$1
 arch_name=$2
 seqgen_name=$3
 splits_file_path=$4
-reference_dir=$5
-model_dir=$6
-predictions_dir=$7
-embeddings_dir=$8
-logfile=$9
+peaks=$5
+reference_dir=$6
+downloads_dir=$7
+model_dir=$8
+predictions_dir=$9
+embeddings_dir=${10}
+logfile=${11}
 
 # the train command
 counts_loss_weight=`counts_loss_weight --input-data $experiment.json`

@@ -8,7 +8,9 @@ reference_dir=$3
 predictions_dir=$4
 peaks=$5
 test_chroms=$6
-logfile=$7
+bounds_dir=$7
+metrics_dir=$8
+logfile=$9
 
 # get the top level keys (task ids) from the experiment json
 echo $( timestamp ): "jq keys" $experiment.json | tee -a $logfile
@@ -21,30 +23,22 @@ for task_id in $tasks
 do
     # get path to the 'signal' bigWig file for this task
     input_file=`jq .$task_id.signal $experiment.json | sed 's/"//g'`
-
-    bounds_dir=bounds
-    echo $( timestamp ): "mkdir" $bounds_dir | tee -a $logfile
-    mkdir $bounds_dir
     
     # compute upper and lower bounds for the task
     echo $( timestamp ): "
     bounds \\
-    --input-profiles $input_file \\
-    --output-names $task_id \\
-    --output-directory $bounds_dir \\
-    --peaks $downloads_dir/$peaks.bed.gz \\
-    --chroms $test_chroms" | tee -a $logfile
+        --input-profiles $input_file \\
+        --output-names $task_id \\
+        --output-directory $bounds_dir \\
+        --peaks $downloads_dir/$peaks.bed.gz \\
+        --chroms $test_chroms" | tee -a $logfile
     
     bounds \
-    --input-profiles $input_file \
-    --output-names $task_id \
-    --output-directory $bounds_dir \
-    --peaks $downloads_dir/$peaks.bed.gz \
-    --chroms $test_chroms
-
-    metrics_dir=metrics
-    echo $( timestamp ): "mkdir" $metrics_dir | tee -a $logfile
-    mkdir $metrics_dir
+        --input-profiles $input_file \
+        --output-names $task_id \
+        --output-directory $bounds_dir \
+        --peaks $downloads_dir/$peaks.bed.gz \
+        --chroms $test_chroms
     
     echo $( timestamp ): "mkdir" $metrics_dir/$task_id | tee -a $logfile
     mkdir $metrics_dir/$task_id

@@ -137,7 +137,7 @@ then
     wait_for_jobs_to_finish "bedtools genomecov"
 
     # Convert bedGraph files to bigWig files 
-    ~/./bedGraphToBigWig $intermediates_dir/$experiment${tag}_plus.bedGraph \
+    bedGraphToBigWig $intermediates_dir/$experiment${tag}_plus.bedGraph \
     $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_plus.bigWig &
     
     echo $( timestamp ): [$!] "~/./bedGraphToBigWig" \
@@ -145,7 +145,7 @@ then
     $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_plus.bigWig | \
     tee -a $logfile
 
-    ~/./bedGraphToBigWig $intermediates_dir/$experiment${tag}_minus.bedGraph \
+    bedGraphToBigWig $intermediates_dir/$experiment${tag}_minus.bedGraph \
     $reference_dir/chrom.sizes $bigWigs_dir/$experiment${tag}_minus.bigWig &
  
     echo $( timestamp ): [$!] "~/./bedGraphToBigWig" \
@@ -170,6 +170,6 @@ else
     $reference_dir/chrom.sizes $bigWigs_dir/$experiment$tag.bigWig \
     | tee -a $logfile
     
-    ~/./bedGraphToBigWig $intermediates_dir/$experiment$tag.bedGraph \
+    bedGraphToBigWig $intermediates_dir/$experiment$tag.bedGraph \
     $reference_dir/chrom.sizes $bigWigs_dir/$experiment$tag.bigWig
 fi
