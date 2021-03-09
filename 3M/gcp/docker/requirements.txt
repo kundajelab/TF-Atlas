@@ -1,4 +1,5 @@
 jupyter==1.0.0
 vdom==0.6
 umap-learn
+joblib==0.17.0
 pomegranate==0.12.0
