@@ -83,7 +83,7 @@ fi
 if [ "$pipeline_destination" = "gcp" ]
 then
     # all outputs be stored in the local directory first
-    dst_dir=""
+    dst_dir=$PWD/
 else
     dst_dir=$pipeline_destination/
 fi
@@ -279,28 +279,28 @@ echo $( timestamp ):"
 python convert_predictions_to_HDF5.py \\
     2114 \\
     1000 \\
-    bigWigs/${experiment}_plus.bigWig \\
-    bigWigs/${experiment}_minus.bigWig \\
-    predictions/${experiment}_split000_task0_plus.bw \\
-    predictions/${experiment}_split000_task0_minus.bw \\
-    predictions/${experiment}_split000_task0_plus_exponentiated_counts.bw \\
-    predictions/${experiment}_split000_task0_minus_exponentiated_counts.bw \\
-    downloads/${peaks}.bed.gz \\
-    \"$(paste -s -d ' ' reference/chroms.txt)\" \\
-    predictions/profile_predictions.h5" | tee -a $logfile
+    $bigWigs_dir/${experiment}_plus.bigWig \\
+    $bigWigs_dir/${experiment}_minus.bigWig \\
+    $predictions_dir/${experiment}_split000_task0_plus.bw \\
+    $predictions_dir/${experiment}_split000_task0_minus.bw \\
+    $predictions_dir/${experiment}_split000_task0_plus_exponentiated_counts.bw \\
+    $predictions_dir/${experiment}_split000_task0_minus_exponentiated_counts.bw \\
+    $downloads_dir/${peaks}.bed.gz \\
+    \"$(paste -s -d ' ' $reference_dir/chroms.txt)\" \\
+    $predictions_dir/profile_predictions.h5" | tee -a $logfile
 
 python convert_predictions_to_HDF5.py \
     2114 \
     1000 \
-    bigWigs/${experiment}_plus.bigWig \
-    bigWigs/${experiment}_minus.bigWig \
-    predictions/${experiment}_split000_task0_plus.bw \
-    predictions/${experiment}_split000_task0_minus.bw \
-    predictions/${experiment}_split000_task0_plus_exponentiated_counts.bw \
-    predictions/${experiment}_split000_task0_minus_exponentiated_counts.bw \
-    downloads/${peaks}.bed.gz \
-    "$(paste -s -d ' ' reference/chroms.txt)" \
-    predictions/profile_predictions.h5
+    $bigWigs_dir/${experiment}_plus.bigWig \
+    $bigWigs_dir/${experiment}_minus.bigWig \
+    $predictions_dir/${experiment}_split000_task0_plus.bw \
+    $predictions_dir/${experiment}_split000_task0_minus.bw \
+    $predictions_dir/${experiment}_split000_task0_plus_exponentiated_counts.bw \
+    $predictions_dir/${experiment}_split000_task0_minus_exponentiated_counts.bw \
+    $downloads_dir/${peaks}.bed.gz \
+    "$(paste -s -d ' ' $reference_dir/chroms.txt)" \
+    $predictions_dir/profile_predictions.h5
 
 # Step 5. Generate Reports
 reports_notebooks_dir=reports
@@ -313,16 +313,16 @@ gsutil -m cp gs://$gcp_bucket/motif_databases/* $motif_dbs_dir/
 # run the reports generation script that converts reports notebooks
 # to HTML
 echo $( timestamp ): "./run_tf_atlas_reports.sh" $experiment $peaks \
-$PWD/$reference_dir $PWD/$downloads_dir $PWD/$predictions_dir \
-$PWD/$metrics_dir $PWD/$embeddings_dir $PWD/$shap_dir $PWD/$modisco_dir \
-$PWD/$motif_dbs_dir/HOCOMOCO_JASPAR_motifs.txt $PWD/$tomtom_temp_dir \
-$PWD/$reports_notebooks_dir $PWD/$reports_output_dir | tee -a $logfile
+$reference_dir $downloads_dir $predictions_dir \
+$metrics_dir $embeddings_dir $shap_dir $modisco_dir \
+$motif_dbs_dir/HOCOMOCO_JASPAR_motifs.txt $tomtom_temp_dir \
+$reports_notebooks_dir $reports_output_dir | tee -a $logfile
 
-./run_tf_atlas_reports.sh $experiment $peaks $PWD/$reference_dir \
-$PWD/$downloads_dir $PWD/$predictions_dir $PWD/$metrics_dir \
-$PWD/$embeddings_dir $PWD/$shap_dir $PWD/$modisco_dir \
-$PWD/$motif_dbs_dir/HOCOMOCO_JASPAR_motifs.txt $PWD/$tomtom_temp_dir \
-$PWD/$reports_notebooks_dir $PWD/$reports_output_dir
+./run_tf_atlas_reports.sh $experiment $peaks $reference_dir \
+$downloads_dir $predictions_dir $metrics_dir \
+$embeddings_dir $shap_dir $modisco_dir \
+$motif_dbs_dir/HOCOMOCO_JASPAR_motifs.txt $tomtom_temp_dir \
+$reports_notebooks_dir $reports_output_dir
 
 echo $( timestamp ): Done. | tee -a $logfile
 
