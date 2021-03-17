@@ -46,7 +46,7 @@ python \
     $experiment \
     True \
     True \
-    BPNetd10008 \
+    BPNet1000d8 \
     BPNet \
     one_split.json \
     chr1 \
