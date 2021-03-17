@@ -160,12 +160,12 @@ echo $( timestamp ): "mkdir" $reports_output_dir | tee -a $logfile
 mkdir $reports_output_dir
 
 # create subdirectory for modisco on profile shap scores
-modisco_profile_dir=${dst_dir}$modisco_dir/profile
+modisco_profile_dir=$modisco_dir/profile
 echo $( timestamp ): "mkdir" $modisco_profile_dir | tee -a $logfile
 mkdir $modisco_profile_dir
 
 # create subdirectory for modisco on counts shap scores
-modisco_counts_dir=${dst_dir}$modisco_dir/counts
+modisco_counts_dir=$modisco_dir/counts
 echo $( timestamp ): "mkdir" $modisco_counts_dir | tee -a $logfile
 mkdir $modisco_counts_dir
 
