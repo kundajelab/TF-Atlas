@@ -175,8 +175,9 @@ $reference_dir/ | tee -a $logfile
 gsutil -m cp gs://$gcp_bucket/reference/$assembly/* $reference_dir/
 
 # Step 1.1 create index for the fasta file
-echo $( timestamp ): "samtools faidx" reference/genome.fa  | tee -a $logfile
-samtools faidx reference/genome.fa
+echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
+tee -a $logfile
+samtools faidx $reference_dir/genome.fa
 
 # Step 2. download bam files and peaks file
 
