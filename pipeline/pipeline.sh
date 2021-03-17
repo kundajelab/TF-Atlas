@@ -61,92 +61,113 @@ encode_access_key=$2
 
 encode_secret_key=$3
 
+# the place where the results of the pipeline run will be stored
+# either mnt or gcp. If "mnt" then output files are stored in 
+# --mnt target, or if "gcp" then the files are uploaded to gcp
+pipeline_destination=$4
+
 # create log file
 logfile=$experiment.log
 touch $logfile
 
 # Step 0. Create all required directories
 
+# check if the pipeline_destination folder exists
+if [ "$pipeline_destination" != "gcp" ] && [ ! -d $pipeline_destination ]
+then
+    echo Pipeline destination folder $pipeline_destination does not exist! | \
+    tee -a $logfile
+    exit 1
+fi
+
+if [ "$pipeline_destination" = "gcp" ]
+then
+    # all outputs be stored in the local directory first
+    dst_dir=""
+else
+    dst_dir=$pipeline_destination/
+fi
+
 # local reference files directory
 reference_dir="reference"
-echo $( timestamp ): "mkdir" $reference_dir | tee -a $logfile
-mkdir $reference_dir
+echo $( timestamp ): "mkdir" $dst_dir$reference_dir | tee -a $logfile
+mkdir $dst_dir$reference_dir
 
 # directory to store downloaded files
 downloads_dir="downloads"
-echo $( timestamp ): "mkdir" $downloads_dir | tee -a $logfile
-mkdir $downloads_dir
+echo $( timestamp ): "mkdir" $dst_dir$downloads_dir | tee -a $logfile
+mkdir $dst_dir$downloads_dir
 
 # directory to store intermediate preprocessing files
 # (merged bams, bedGraphs)
 intermediates_dir=intermediates
-echo $( timestamp ): "mkdir" $intermediates_dir | tee -a $logfile
-mkdir $intermediates_dir
+echo $( timestamp ): "mkdir" $dst_dir$intermediates_dir | tee -a $logfile
+mkdir $dst_dir$intermediates_dir
 
 # directory to store bigWigs
 bigWigs_dir=bigWigs
-echo $( timestamp ): "mkdir" $bigWigs_dir | tee -a $logfile
-mkdir $bigWigs_dir
+echo $( timestamp ): "mkdir" $dst_dir$bigWigs_dir | tee -a $logfile
+mkdir $dst_dir$bigWigs_dir
 
 # create new directory to store model file
 model_dir=model
-echo $( timestamp ): "mkdir" $model_dir
-mkdir $model_dir
+echo $( timestamp ): "mkdir" $dst_dir$model_dir | tee -a $logfile
+mkdir $dst_dir$model_dir
 
 # dreictory to store predictions
 predictions_dir=predictions
-echo $( timestamp ): "mkdir" $predictions_dir | tee -a $logfile
-mkdir $predictions_dir
+echo $( timestamp ): "mkdir" $dst_dir$predictions_dir | tee -a $logfile
+mkdir $dst_dir$predictions_dir
 
 # directory to store computed embeddings
 embeddings_dir=embeddings
-echo $( timestamp ): "mkdir" $embeddings_dir | tee -a $logfile
-mkdir $embeddings_dir
+echo $( timestamp ): "mkdir" $dst_dir$embeddings_dir | tee -a $logfile
+mkdir $dst_dir$embeddings_dir
 
 # directory to store min max bounds
 bounds_dir=bounds
-echo $( timestamp ): "mkdir" $bounds_dir | tee -a $logfile
-mkdir $bounds_dir
+echo $( timestamp ): "mkdir" $dst_dir$bounds_dir | tee -a $logfile
+mkdir $dst_dir$bounds_dir
    
 # directory to store metrics output
 metrics_dir=metrics
-echo $( timestamp ): "mkdir" $metrics_dir | tee -a $logfile
-mkdir $metrics_dir
+echo $( timestamp ): "mkdir" $dst_dir$metrics_dir | tee -a $logfile
+mkdir $dst_dir$metrics_dir
 
 # directory to store shap contribution scores
 shap_dir=shap
-echo $( timestamp ): "mkdir" $shap_dir | tee -a $logfile
-mkdir $shap_dir
+echo $( timestamp ): "mkdir" $dst_dir$shap_dir | tee -a $logfile
+mkdir $dst_dir$shap_dir
 
 # directory to store modisco output
 modisco_dir=modisco
-echo $( timestamp ): "mkdir" $modisco_dir | tee -a $logfile
-mkdir $modisco_dir
+echo $( timestamp ): "mkdir" $dst_dir$modisco_dir | tee -a $logfile
+mkdir $dst_dir$modisco_dir
 
 # directory to store motif databases needed for reports generation
 motif_dbs_dir=motif_databases
-echo $( timestamp ): "mkdir" $motif_dbs_dir | tee -a $logfile
-mkdir $motif_dbs_dir
+echo $( timestamp ): "mkdir" $dst_dir$motif_dbs_dir | tee -a $logfile
+mkdir $dst_dir$motif_dbs_dir
 
 # directory to store the temp output of tomtom matching in MEME suite
 tomtom_temp_dir=tomtom
-echo $( timestamp ): "mkdir" $tomtom_temp_dir | tee -a $logfile
-mkdir $tomtom_temp_dir
+echo $( timestamp ): "mkdir" $dst_dir$tomtom_temp_dir | tee -a $logfile
+mkdir $dst_dir$tomtom_temp_dir
 
 # directory to store html reports 
 reports_output_dir=reports_output
-echo $( timestamp ): "mkdir" $reports_output_dir | tee -a $logfile
-mkdir $reports_output_dir
+echo $( timestamp ): "mkdir" $dst_dir$reports_output_dir | tee -a $logfile
+mkdir $dst_dir$reports_output_dir
 
 # create subdirectory for modisco on profile shap scores
 modisco_profile_dir=$modisco_dir/profile
-echo $( timestamp ): "mkdir" $modisco_profile_dir | tee -a $logfile
-mkdir $modisco_profile_dir
+echo $( timestamp ): "mkdir" $dst_dir$modisco_profile_dir | tee -a $logfile
+mkdir $dst_dir$modisco_profile_dir
 
 # create subdirectory for modisco on counts shap scores
 modisco_counts_dir=$modisco_dir/counts
-echo $( timestamp ): "mkdir" $modisco_counts_dir | tee -a $logfile
-mkdir $modisco_counts_dir
+echo $( timestamp ): "mkdir" $dst_dir$modisco_counts_dir | tee -a $logfile
+mkdir $dst_dir$modisco_counts_dir
 
 # Step 1. Download the reference files from gcp based on assembly
 echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/$assembly/* \
@@ -303,3 +324,55 @@ $PWD/$motif_dbs_dir/HOCOMOCO_JASPAR_motifs.txt $PWD/$tomtom_temp_dir \
 $PWD/$reports_notebooks_dir $PWD/$reports_output_dir
 
 echo $( timestamp ): Done. | tee -a $logfile
+
+# Step 6. Copy files to gcp if pipeline_destination is "gcp"
+if [ "$pipeline_destination" = "gcp" ]
+then
+    # bigWigs
+    echo $( timestamp ): "gsutil -m cp" $bigWigs_dir/* \
+    gs://$gcp_bucket/data/bigWigs/$experiment/ | tee -a $logfile
+
+    gsutil -m cp $bigWigs_dir/* gs://$gcp_bucket/data/bigWigs/$experiment/
+    
+    # model
+    echo $( timestamp ): "gsutil -m cp" $model_dir/* \
+    gs://$gcp_bucket/models/$experiment/ | tee -a $logfile
+
+    gsutil -m cp $model_dir/* gs://$gcp_bucket/models/$experiment/
+    
+    # predictions
+    echo $( timestamp ): "gsutil -m cp" $predictions_dir/* \
+    gs://$gcp_bucket/predictions/$experiment/ | tee -a $logfile
+    
+    gsutil -m cp $predictions_dir/* gs://$gcp_bucket/predictions/$experiment/
+    
+    # metrics
+    echo $( timestamp ): "gsutil -m cp" $metrics_dir/* \
+    gs://$gcp_bucket/metrics/$experiment/
+    
+    gsutil -m cp $metrics_dir/* gs://$gcp_bucket/metrics/$experiment/
+    
+    # embeddings
+    echo $( timestamp ): "gsutil -m cp" $embeddings_dir/* \
+    gs://$gcp_bucket/embeddings/$experiment/ | tee -a $logfile
+    
+    gsutil -m cp $embeddings_dir/* gs://$gcp_bucket/embeddings/$experiment/
+
+    # shap
+    echo $( timestamp ): "gsutil -m cp" $shap_dir/* \
+    gs://$gcp_bucket/shap/$experiment/ | tee -a $logfile
+    
+    gsutil -m cp $shap_dir/* gs://$gcp_bucket/shap/$experiment/
+
+    # modisco
+    echo $( timestamp ): "gsutil -m cp" $modisco_dir/* \
+    gs://$gcp_bucket/modisco/$experiment/ | tee -a $logfile
+
+    gsutil -m cp $modisco_dir/* gs://$gcp_bucket/modisco/$experiment/
+
+    # reports
+    echo $( timestamp ): "gsutil -m cp" $reports_dir/* \
+    gs://$gcp_bucket/reports/$experiment/ | tee -a $logfile
+    
+    gsutil -m cp $reports_dir/* gs://$gcp_bucket/reports/$experiment/
+fi
