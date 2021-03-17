@@ -89,85 +89,85 @@ else
 fi
 
 # local reference files directory
-reference_dir="reference"
-echo $( timestamp ): "mkdir" $dst_dir$reference_dir | tee -a $logfile
-mkdir $dst_dir$reference_dir
+reference_dir=${dst_dir}reference
+echo $( timestamp ): "mkdir" $reference_dir | tee -a $logfile
+mkdir $reference_dir
 
 # directory to store downloaded files
-downloads_dir="downloads"
-echo $( timestamp ): "mkdir" $dst_dir$downloads_dir | tee -a $logfile
-mkdir $dst_dir$downloads_dir
+downloads_dir=${dst_dir}downloads
+echo $( timestamp ): "mkdir" $downloads_dir | tee -a $logfile
+mkdir $downloads_dir
 
 # directory to store intermediate preprocessing files
 # (merged bams, bedGraphs)
-intermediates_dir=intermediates
-echo $( timestamp ): "mkdir" $dst_dir$intermediates_dir | tee -a $logfile
-mkdir $dst_dir$intermediates_dir
+intermediates_dir=${dst_dir}intermediates
+echo $( timestamp ): "mkdir" $intermediates_dir | tee -a $logfile
+mkdir $intermediates_dir
 
 # directory to store bigWigs
-bigWigs_dir=bigWigs
-echo $( timestamp ): "mkdir" $dst_dir$bigWigs_dir | tee -a $logfile
-mkdir $dst_dir$bigWigs_dir
+bigWigs_dir=${dst_dir}bigWigs
+echo $( timestamp ): "mkdir" $bigWigs_dir | tee -a $logfile
+mkdir $bigWigs_dir
 
 # create new directory to store model file
-model_dir=model
-echo $( timestamp ): "mkdir" $dst_dir$model_dir | tee -a $logfile
-mkdir $dst_dir$model_dir
+model_dir=${dst_dir}model
+echo $( timestamp ): "mkdir" $model_dir | tee -a $logfile
+mkdir $model_dir
 
 # dreictory to store predictions
-predictions_dir=predictions
-echo $( timestamp ): "mkdir" $dst_dir$predictions_dir | tee -a $logfile
-mkdir $dst_dir$predictions_dir
+predictions_dir=${dst_dir}predictions
+echo $( timestamp ): "mkdir" $predictions_dir | tee -a $logfile
+mkdir $predictions_dir
 
 # directory to store computed embeddings
-embeddings_dir=embeddings
-echo $( timestamp ): "mkdir" $dst_dir$embeddings_dir | tee -a $logfile
-mkdir $dst_dir$embeddings_dir
+embeddings_dir=${dst_dir}embeddings
+echo $( timestamp ): "mkdir" $embeddings_dir | tee -a $logfile
+mkdir $embeddings_dir
 
 # directory to store min max bounds
-bounds_dir=bounds
-echo $( timestamp ): "mkdir" $dst_dir$bounds_dir | tee -a $logfile
-mkdir $dst_dir$bounds_dir
+bounds_dir=${dst_dir}bounds
+echo $( timestamp ): "mkdir" $bounds_dir | tee -a $logfile
+mkdir $bounds_dir
    
 # directory to store metrics output
-metrics_dir=metrics
-echo $( timestamp ): "mkdir" $dst_dir$metrics_dir | tee -a $logfile
-mkdir $dst_dir$metrics_dir
+metrics_dir=${dst_dir}metrics
+echo $( timestamp ): "mkdir" $metrics_dir | tee -a $logfile
+mkdir $metrics_dir
 
 # directory to store shap contribution scores
-shap_dir=shap
-echo $( timestamp ): "mkdir" $dst_dir$shap_dir | tee -a $logfile
-mkdir $dst_dir$shap_dir
+shap_dir=${dst_dir}shap
+echo $( timestamp ): "mkdir" $shap_dir | tee -a $logfile
+mkdir $shap_dir
 
 # directory to store modisco output
-modisco_dir=modisco
-echo $( timestamp ): "mkdir" $dst_dir$modisco_dir | tee -a $logfile
-mkdir $dst_dir$modisco_dir
+modisco_dir=${dst_dir}modisco
+echo $( timestamp ): "mkdir" $modisco_dir | tee -a $logfile
+mkdir $modisco_dir
 
 # directory to store motif databases needed for reports generation
-motif_dbs_dir=motif_databases
-echo $( timestamp ): "mkdir" $dst_dir$motif_dbs_dir | tee -a $logfile
-mkdir $dst_dir$motif_dbs_dir
+motif_dbs_dir=${dst_dir}motif_databases
+echo $( timestamp ): "mkdir" $motif_dbs_dir | tee -a $logfile
+mkdir $motif_dbs_dir
 
 # directory to store the temp output of tomtom matching in MEME suite
-tomtom_temp_dir=tomtom
-echo $( timestamp ): "mkdir" $dst_dir$tomtom_temp_dir | tee -a $logfile
-mkdir $dst_dir$tomtom_temp_dir
+tomtom_temp_dir=${dst_dir}tomtom
+echo $( timestamp ): "mkdir" $tomtom_temp_dir | tee -a $logfile
+mkdir $tomtom_temp_dir
 
 # directory to store html reports 
-reports_output_dir=reports_output
-echo $( timestamp ): "mkdir" $dst_dir$reports_output_dir | tee -a $logfile
-mkdir $dst_dir$reports_output_dir
+reports_output_dir=${dst_dir}reports_output
+echo $( timestamp ): "mkdir" $reports_output_dir | tee -a $logfile
+mkdir $reports_output_dir
 
 # create subdirectory for modisco on profile shap scores
-modisco_profile_dir=$modisco_dir/profile
-echo $( timestamp ): "mkdir" $dst_dir$modisco_profile_dir | tee -a $logfile
-mkdir $dst_dir$modisco_profile_dir
+modisco_profile_dir=${dst_dir}$modisco_dir/profile
+echo $( timestamp ): "mkdir" $modisco_profile_dir | tee -a $logfile
+mkdir $modisco_profile_dir
 
 # create subdirectory for modisco on counts shap scores
-modisco_counts_dir=$modisco_dir/counts
-echo $( timestamp ): "mkdir" $dst_dir$modisco_counts_dir | tee -a $logfile
-mkdir $dst_dir$modisco_counts_dir
+modisco_counts_dir=${dst_dir}$modisco_dir/counts
+echo $( timestamp ): "mkdir" $modisco_counts_dir | tee -a $logfile
+mkdir $modisco_counts_dir
 
 # Step 1. Download the reference files from gcp based on assembly
 echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/$assembly/* \
