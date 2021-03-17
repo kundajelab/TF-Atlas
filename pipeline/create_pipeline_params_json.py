@@ -43,7 +43,15 @@ params_dict['experiment'] = experiment_id
 # load the metadata file
 metadata_df = pd.read_csv(metadata_file_path, sep='\t', header=0)
 
+# find the row matching the experiment_id
 row = metadata_df[metadata_df['experiment'] == experiment_id]
+
+# check if the experiment_id exists
+if row.empty:
+    print("Experiment {} not found in metadata".format(experiment_id))
+    sys.exit(1)
+    
+# construct a python dictionary with all the fields
 params_dict['assembly'] = row['assembly'].values[0]
 params_dict['unfiltered_alignments'] = \
     make_string(row['unfiltered_alignments'])
@@ -73,5 +81,6 @@ params_dict['splits_json_path'] = splits_json_path
 params_dict['test_chroms'] = test_chroms
 params_dict['gcp_bucket'] = gcp_bucket
 
+# write python dictionary to json file
 with open("pipeline_params_{}.json".format(experiment_id), "w") as outfile:  
     json.dump(params_dict, outfile, indent='\t')
