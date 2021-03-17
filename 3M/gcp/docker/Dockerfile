@@ -29,12 +29,6 @@ RUN ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
 # Attach Conda to PATH
 ENV PATH /opt/conda/bin:$PATH
 
-# Install BPNet repo
-RUN pip install --no-cache-dir --ignore-installed git+https://github.com/kundajelab/basepairmodels.git
-
-# Copy down the TF-Atlas scripts
-RUN git clone https://github.com/kundajelab/TF-Atlas.git
-
 # Install a specific version of MEME
 RUN wget https://meme-suite.org/meme/meme-software/5.0.1/meme_5.0.1.tar.gz && \
 	tar xzf meme_5.0.1.tar.gz && \
@@ -63,3 +57,13 @@ RUN conda clean -tipsy
 # Set environment variables for Python
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
+
+ARG BPNet_REPO_VER=0.1.2
+
+# Install BPNet repo
+RUN pip install git+https://github.com/kundajelab/basepairmodels.git
+
+ARG TFATL_REPO_VER=0.0
+
+# Copy down the TF-Atlas scripts
+RUN git clone https://github.com/kundajelab/TF-Atlas.git
