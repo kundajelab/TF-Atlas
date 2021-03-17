@@ -96,6 +96,7 @@ embeddings \\
     --peaks $downloads_dir/$peaks.bed.gz \\
     --numbered-embeddings-layers-prefix dil_conv \\
     --cropped-size 1000 \\
+    --batch-size 256 \\
     --output-directory $embeddings_dir" | tee -a $logfile
 
 embeddings \
@@ -105,4 +106,5 @@ embeddings \
     --peaks $downloads_dir/$peaks.bed.gz \
     --numbered-embeddings-layers-prefix dil_conv \
     --cropped-size 1000 \
+    --batch-size 256 \
     --output-directory $embeddings_dir 
