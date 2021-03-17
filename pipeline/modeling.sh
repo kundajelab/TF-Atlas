@@ -94,6 +94,8 @@ embeddings \\
     --reference-genome $reference_dir/genome.fa \\
     --input-layer-shape 2114 4 \\
     --peaks $downloads_dir/$peaks.bed.gz \\
+    --numbered-embeddings-layers-prefix dil_conv \\
+    --cropped-size 1000 \\
     --output-directory $embeddings_dir" | tee -a $logfile
 
 embeddings \
@@ -101,4 +103,6 @@ embeddings \
     --reference-genome $reference_dir/genome.fa \
     --input-layer-shape 2114 4 \
     --peaks $downloads_dir/$peaks.bed.gz \
-    --output-directory $embeddings_dir
+    --numbered-embeddings-layers-prefix dil_conv \
+    --cropped-size 1000 \
+    --output-directory $embeddings_dir 
