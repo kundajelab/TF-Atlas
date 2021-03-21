@@ -37,12 +37,16 @@ TFM_PRED_PATH=$predictions_path \
 #TF-MoDISco results
 for key in profile counts
 do
+    # temp directory for tomtom matching
+    echo $( timestamp ): "mkdir" $tomtom_temp_dir/$key | tee -a $logfile
+    mkdir $tomtom_temp_dir/$key
+    
 	TFM_PRED_PATH=$predictions_path \
 		TFM_SHAP_PATH=$shap_dir/${key}_scores.h5 \
 		TFM_TFM_PATH=$modisco_dir/$key/modisco_results.h5 \
 		TFM_PEAKS_PATH=$peaks_path \
         TFM_TOMTOM_DB_PATH=$motif_db \
-        TFM_TOMTOM_TEMP_DIR=$tomtom_temp_dir \
+        TFM_TOMTOM_TEMP_DIR=$tomtom_temp_dir/$key \
 		jupyter nbconvert \
         --execute $reports_notebooks_dir/view_tfmodisco_results.ipynb \
         --to HTML --output $reports_output_dir/${key}_tfm_results \
