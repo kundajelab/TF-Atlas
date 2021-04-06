@@ -9,10 +9,15 @@
 
 # command line params
 experiment=$1
-encode_access_key=$2
-encode_secret_key=$3
-gcp_bucket=$4 #gbsc-gcp-lab-kundaje-tf-atlas
-pipeline_destination=$5
+learning_rate=$2
+# use -1 for counts_loss_weight if you want to auto set
+counts_loss_weight=$3 
+epochs=$4
+encode_access_key=$5
+encode_secret_key=$6
+#gbsc-gcp-lab-kundaje-tf-atlas
+gcp_bucket=$7
+pipeline_destination=$8
 
 # create the log file
 logfile=$PWD/$experiment.log
@@ -38,6 +43,9 @@ python \\
     BPNet \\
     one_split.json \\
     chr1 \\
+    learning_rate \\
+    counts_loss_weight \\
+    epochs \\
     $gcp_bucket" | tee -a $logfile
     
 python \
@@ -50,6 +58,9 @@ python \
     BPNet \
     one_split.json \
     chr1 \
+    learning_rate \
+    counts_loss_weight \
+    epochs \
     $gcp_bucket
 
 # if the pipeline params json was generated successfully

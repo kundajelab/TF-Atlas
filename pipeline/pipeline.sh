@@ -55,6 +55,12 @@ splits_json_path=`jq .splits_json_path $pipeline_json | sed 's/"//g'`
 
 test_chroms=`jq .test_chroms $pipeline_json | sed 's/"//g'`
 
+learning_rate=`jq .learning_rate $pipeline_json | sed 's/"//g'`
+
+counts_loss_weight=`jq .counts_loss_weight $pipeline_json | sed 's/"//g'`
+
+epochs=`jq .epochs $pipeline_json | sed 's/"//g'`
+
 gcp_bucket=`jq .gcp_bucket $pipeline_json | sed 's/"//g'`
 
 encode_access_key=$2
@@ -247,13 +253,14 @@ $downloads_dir .
 # Step 4.1 Modeling
 
 echo $( timestamp ): "./modeling.sh" $experiment $model_arch_name \
-$sequence_generator_name $splits_json_path $peaks $reference_dir \
-$downloads_dir $model_dir $predictions_dir $embeddings_dir $logfile | \
-tee -a $logfile
+$sequence_generator_name $splits_json_path $peaks $learning_rate \
+$counts_loss_weight $epochs $reference_dir $downloads_dir $model_dir \
+$predictions_dir $embeddings_dir $logfile | tee -a $logfile
 
 ./modeling.sh $experiment $model_arch_name $sequence_generator_name \
-$splits_json_path $peaks $reference_dir $downloads_dir $model_dir \
-$predictions_dir $embeddings_dir $logfile
+$splits_json_path $peaks $learning_rate $counts_loss_weight $epochs \
+$reference_dir $downloads_dir $model_dir $predictions_dir $embeddings_dir \
+$logfile
 
 # Step 4.3 Metrics
 

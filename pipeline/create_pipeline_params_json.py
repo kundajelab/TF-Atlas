@@ -21,7 +21,10 @@ model_arch_name=sys.argv[5]
 sequence_generator_name=sys.argv[6]
 splits_json_path=sys.argv[7]
 test_chroms=sys.argv[8]
-gcp_bucket=sys.argv[9]
+learning_rate=sys.argv[9]
+counts_loss_weight=sys.argv[10]
+epochs=sys.argv[11]
+gcp_bucket=sys.argv[12]
 
 def make_string(pandas_col_obj):
     """
@@ -79,6 +82,9 @@ params_dict['model_arch_name'] = model_arch_name
 params_dict['sequence_generator_name'] = sequence_generator_name
 params_dict['splits_json_path'] = splits_json_path
 params_dict['test_chroms'] = test_chroms
+params_dict['learning_rate'] = learning_rate
+params_dict['counts_loss_weight'] = counts_loss_weight
+params_dict['epochs'] = epochs
 params_dict['gcp_bucket'] = gcp_bucket
 
 # write python dictionary to json file

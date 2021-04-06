@@ -7,15 +7,23 @@ arch_name=$2
 seqgen_name=$3
 splits_file_path=$4
 peaks=$5
-reference_dir=$6
-downloads_dir=$7
-model_dir=$8
-predictions_dir=$9
-embeddings_dir=${10}
-logfile=${11}
+learning_rat=$6
+counts_loss_weight=$7
+epochs=$8
+reference_dir=$9
+downloads_dir=${10}
+model_dir=${11}
+predictions_dir=${12}
+embeddings_dir=${13}
+logfile=${14}
+
+# if counts_loss_weight is -1 then auto set based on stats 
+if [ $counts_loss_weight -eq -1 ]
+then
+    counts_loss_weight=`counts_loss_weight --input-data $experiment.json`
+fi
 
 # the train command
-counts_loss_weight=`counts_loss_weight --input-data $experiment.json`
 echo $( timestamp ): "
 train \\
     --input-data $experiment.json \\
@@ -25,7 +33,7 @@ train \\
     --chrom-sizes $reference_dir/chrom.sizes \\
     --chroms $(paste -s -d ' ' $reference_dir/chroms.txt)  \\
     --shuffle \\
-    --epochs 100 \\
+    --epochs $epochs \\
     --splits $splits_file_path \\
     --model-arch-name $arch_name \\
     --sequence-generator-name $seqgen_name \\
@@ -34,6 +42,7 @@ train \\
     --output-len 1000 \\
     --filters 64 \\
     --threads 10 \\
+    --learning-rate $learning_rate \\
     --counts-loss-weight $counts_loss_weight" | tee -a $logfile
 
 train \
@@ -44,7 +53,7 @@ train \
     --chrom-sizes $reference_dir/chrom.sizes \
     --chroms $(paste -s -d ' ' $reference_dir/chroms.txt)  \
     --shuffle \
-    --epochs 100 \
+    --epochs $epochs \
     --splits $splits_file_path \
     --model-arch-name $arch_name \
     --sequence-generator-name $seqgen_name \
@@ -53,6 +62,7 @@ train \
     --output-len 1000 \
     --filters 64 \
     --threads 10 \
+    --learning-rate $learning_rate \
     --counts-loss-weight $counts_loss_weight
 
 echo $( timestamp ): "
