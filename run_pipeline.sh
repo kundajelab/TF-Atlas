@@ -58,9 +58,9 @@ python \
     BPNet \
     one_split.json \
     chr1 \
-    learning_rate \
-    counts_loss_weight \
-    epochs \
+    $learning_rate \
+    $counts_loss_weight \
+    $epochs \
     $gcp_bucket
 
 # if the pipeline params json was generated successfully
