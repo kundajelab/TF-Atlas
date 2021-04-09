@@ -10,6 +10,8 @@
 # import the utils script
 . utils.sh
 
+
+
 # path to json file with pipeline params
 pipeline_json=$1
 
@@ -55,6 +57,8 @@ splits_json_path=`jq .splits_json_path $pipeline_json | sed 's/"//g'`
 
 test_chroms=`jq .test_chroms $pipeline_json | sed 's/"//g'`
 
+tuning=`jq .tuning $pipeline_json | sed 's/"//g'`
+
 learning_rate=`jq .learning_rate $pipeline_json | sed 's/"//g'`
 
 counts_loss_weight=`jq .counts_loss_weight $pipeline_json | sed 's/"//g'`
@@ -75,6 +79,8 @@ pipeline_destination=$4
 # create log file
 logfile=$experiment.log
 touch $logfile
+
+
 
 # Step 0. Create all required directories
 
@@ -119,6 +125,11 @@ mkdir $bigWigs_dir
 model_dir=${dst_dir}model
 echo $( timestamp ): "mkdir" $model_dir | tee -a $logfile
 mkdir $model_dir
+
+# create new directory to store hyperparameter tuning files
+tuning_dir=${dst_dir}tuning
+echo $( timestamp ): "mkdir" $tuning_dir | tee -a $logfile
+mkdir $tuning_dir
 
 # dreictory to store predictions
 predictions_dir=${dst_dir}predictions
@@ -175,82 +186,112 @@ modisco_counts_dir=$modisco_dir/counts
 echo $( timestamp ): "mkdir" $modisco_counts_dir | tee -a $logfile
 mkdir $modisco_counts_dir
 
-# Step 1. Download the reference files from gcp based on assembly
-echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/$assembly/* \
-$reference_dir/ | tee -a $logfile
-gsutil -m cp gs://$gcp_bucket/reference/$assembly/* $reference_dir/
+# # Step 1. Download the reference files from gcp based on assembly
+# echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/$assembly/* \
+# $reference_dir/ | tee -a $logfile
+# gsutil -m cp gs://$gcp_bucket/reference/$assembly/* $reference_dir/
 
-# Step 1.1 create index for the fasta file
-echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
-tee -a $logfile
-samtools faidx $reference_dir/genome.fa
+# # Step 1.1 create index for the fasta file
+# echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
+# tee -a $logfile
+# samtools faidx $reference_dir/genome.fa
 
-# Step 2. download bam files and peaks file
+# # Step 2. download bam files and peaks file
 
-# 2.1 download unfiltered alignments bams
-download_file "$unfiltered_alignments" "bam" \
-"$unfiltered_alignments_md5sums" 1 $logfile $encode_access_key \
-$encode_secret_key $downloads_dir
+# # 2.1 download unfiltered alignments bams
+# download_file "$unfiltered_alignments" "bam" \
+# "$unfiltered_alignments_md5sums" 1 $logfile $encode_access_key \
+# $encode_secret_key $downloads_dir
 
-# 2.2 download alignments bams
-download_file "$alignments" "bam" "$alignments_md5sums" 1 $logfile \
-$encode_access_key $encode_secret_key $downloads_dir
+# # 2.2 download alignments bams
+# download_file "$alignments" "bam" "$alignments_md5sums" 1 $logfile \
+# $encode_access_key $encode_secret_key $downloads_dir
 
-if [ "$has_control" = "True" ]
-then
-    # 2.3 download control unfiltered alignmentsbams
-    download_file "$control_unfiltered_alignments" "bam" \
-    "$control_unfiltered_alignments_md5sums" 1 $logfile $encode_access_key \
-    $encode_secret_key $downloads_dir
+# if [ "$has_control" = "True" ]
+# then
+#     # 2.3 download control unfiltered alignmentsbams
+#     download_file "$control_unfiltered_alignments" "bam" \
+#     "$control_unfiltered_alignments_md5sums" 1 $logfile $encode_access_key \
+#     $encode_secret_key $downloads_dir
 
-    # 2.4 download control alignments bams
-    download_file "$control_alignments" "bam" "$control_alignments_md5sums" 1 \
-    $logfile $encode_access_key $encode_secret_key $downloads_dir
-fi
+#     # 2.4 download control alignments bams
+#     download_file "$control_alignments" "bam" "$control_alignments_md5sums" 1 \
+#     $logfile $encode_access_key $encode_secret_key $downloads_dir
+# fi
 
-# 2.5 download peaks file
-download_file $peaks "bed.gz" $peaks_md5sum 1 $logfile $encode_access_key \
-$encode_secret_key $downloads_dir
+# # 2.5 download peaks file
+# download_file $peaks "bed.gz" $peaks_md5sum 1 $logfile $encode_access_key \
+# $encode_secret_key $downloads_dir
 
-wait_for_jobs_to_finish "Download"
+# wait_for_jobs_to_finish "Download"
 
-# Step 3. preprocess
+# # Step 3. preprocess
 
-# 3.1 preprocess experiment bams
-./preprocessing.sh $experiment "$unfiltered_alignments" "$alignments" \
-$downloads_dir $intermediates_dir $bigWigs_dir $stranded False $reference_dir \
-$logfile &
+# # 3.1 preprocess experiment bams
+# ./preprocessing.sh $experiment "$unfiltered_alignments" "$alignments" \
+# $downloads_dir $intermediates_dir $bigWigs_dir $stranded False $reference_dir \
+# $logfile &
 
-echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
-\"$unfiltered_alignments\" \"$alignments\" $downloads_dir $intermediates_dir \
-$bigWigs_dir $stranded False $reference_dir $logfile  | tee -a $logfile
+# echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
+# \"$unfiltered_alignments\" \"$alignments\" $downloads_dir $intermediates_dir \
+# $bigWigs_dir $stranded False $reference_dir $logfile  | tee -a $logfile
 
-if [ "$has_control" = "True" ]
-then
-    # 3.2 preprocess experiment control bams
-    ./preprocessing.sh $experiment "$control_unfiltered_alignments" \
-    "$control_alignments" $downloads_dir $intermediates_dir $bigWigs_dir \
-    $stranded True $reference_dir $logfile &
+# if [ "$has_control" = "True" ]
+# then
+#     # 3.2 preprocess experiment control bams
+#     ./preprocessing.sh $experiment "$control_unfiltered_alignments" \
+#     "$control_alignments" $downloads_dir $intermediates_dir $bigWigs_dir \
+#     $stranded True $reference_dir $logfile &
     
-    echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
-    \"$control_unfiltered_alignments\" \"$control_alignments\" $downloads_dir \
-    $intermediates_dir $bigWigs_dir $stranded True $reference_dir $logfile | \
-    tee -a $logfile
-fi
+#     echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
+#     \"$control_unfiltered_alignments\" \"$control_alignments\" $downloads_dir \
+#     $intermediates_dir $bigWigs_dir $stranded True $reference_dir $logfile | \
+#     tee -a $logfile
+# fi
 
-wait_for_jobs_to_finish "Preprocessing"
+# wait_for_jobs_to_finish "Preprocessing"
 
-# Step pre_4: Create the input json for the experiment that will
-# be used in training
-echo $( timestamp ): "python create_input_json.py" $experiment $peaks True \
-True $bigWigs_dir $downloads_dir . | tee -a $logfile
+# # Step pre_4: Create the input json for the experiment that will
+# # be used in training
+# echo $( timestamp ): "python create_input_json.py" $experiment $peaks True \
+# True $bigWigs_dir $downloads_dir . | tee -a $logfile
 
-python create_input_json.py $experiment $peaks True True $bigWigs_dir \
-$downloads_dir .
+# python create_input_json.py $experiment $peaks True True $bigWigs_dir \
+# $downloads_dir .
     
 # Step 4. Run 3M (Modeling, Metrics, Modisco)
 
-# Step 4.1 Modeling
+
+if [ "$tuning" = "True" ]
+then
+    # Step 4.1.0 Tuning
+    
+    # We will train models with different hyperparameters and 
+    # pick the learning rate and counts_loss_weight based on the model
+    # with the lowest loss. This can be any script it just to output
+    # tuning_output.json with learning_rate and counts_loss_weight values.
+
+    echo $( timestamp ): "./tuning.sh" $experiment $model_arch_name \
+    $sequence_generator_name $splits_json_path $peaks $learning_rate \
+    $counts_loss_weight $epochs $reference_dir $downloads_dir $model_dir \
+    $predictions_dir $embeddings_dir $logfile $tuning_dir | tee -a $logfile
+
+    ./tuning.sh $experiment $model_arch_name $sequence_generator_name \
+    $splits_json_path $peaks $learning_rate $counts_loss_weight $epochs \
+    $reference_dir $downloads_dir $model_dir $predictions_dir $embeddings_dir \
+    $logfile $tuning_dir | tee -a $logfile
+
+
+    learning_rate=`jq .learning_rate tuning_output.json | sed 's/"//g'`
+
+    counts_loss_weight=`jq .counts_loss_weight tuning_output.json | sed 's/"//g'`
+    
+    echo "learning_rate="$learning_rate
+    echo "counts_loss_weight="$counts_loss_weight
+
+fi
+
+# Step 4.1.1 Modeling
 
 echo $( timestamp ): "./modeling.sh" $experiment $model_arch_name \
 $sequence_generator_name $splits_json_path $peaks $learning_rate \
@@ -262,7 +303,7 @@ $splits_json_path $peaks $learning_rate $counts_loss_weight $epochs \
 $reference_dir $downloads_dir $model_dir $predictions_dir $embeddings_dir \
 $logfile
 
-# Step 4.3 Metrics
+# Step 4.2 Metrics
 
 echo $( timestamp ): "./metrics.sh" $experiment $downloads_dir $reference_dir \
 $predictions_dir $peaks $test_chroms $logfile | tee -a $logfile

@@ -9,15 +9,16 @@
 
 # command line params
 experiment=$1
-learning_rate=$2
+tuning=$2
+learning_rate=$3
 # use -1 for counts_loss_weight if you want to auto set
-counts_loss_weight=$3 
-epochs=$4
-encode_access_key=$5
-encode_secret_key=$6
+counts_loss_weight=$4 
+epochs=$5
+encode_access_key=$6
+encode_secret_key=$7
 #gbsc-gcp-lab-kundaje-tf-atlas
-gcp_bucket=$7
-pipeline_destination=$8
+gcp_bucket=$8
+pipeline_destination=$9
 
 # create the log file
 logfile=$PWD/$experiment.log
@@ -43,9 +44,10 @@ python \\
     BPNet \\
     one_split.json \\
     chr1 \\
-    learning_rate \\
-    counts_loss_weight \\
-    epochs \\
+    $tuning \\
+    $learning_rate \\
+    $counts_loss_weight \\
+    $epochs \\
     $gcp_bucket" | tee -a $logfile
     
 python \
@@ -58,6 +60,7 @@ python \
     BPNet \
     one_split.json \
     chr1 \
+    $tuning \
     $learning_rate \
     $counts_loss_weight \
     $epochs \
