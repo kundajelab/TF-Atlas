@@ -50,9 +50,6 @@ RUN rm requirements.txt
 # Install jq
 RUN apt-get install -y jq
 
-# Install BayesianOptimization
-
-RUN pip install bayesian-optimization
 
 # Clean up after apt and conda
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -71,3 +68,7 @@ ARG TFATL_REPO_VER=0.0
 
 # Copy down the TF-Atlas scripts
 RUN git clone https://github.com/kundajelab/TF-Atlas.git
+
+# Install BayesianOptimization
+
+RUN pip install bayesian-optimization
