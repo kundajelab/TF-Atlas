@@ -186,78 +186,78 @@ modisco_counts_dir=$modisco_dir/counts
 echo $( timestamp ): "mkdir" $modisco_counts_dir | tee -a $logfile
 mkdir $modisco_counts_dir
 
-# # Step 1. Download the reference files from gcp based on assembly
-# echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/$assembly/* \
-# $reference_dir/ | tee -a $logfile
-# gsutil -m cp gs://$gcp_bucket/reference/$assembly/* $reference_dir/
+# Step 1. Download the reference files from gcp based on assembly
+echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/$assembly/* \
+$reference_dir/ | tee -a $logfile
+gsutil -m cp gs://$gcp_bucket/reference/$assembly/* $reference_dir/
 
-# # Step 1.1 create index for the fasta file
-# echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
-# tee -a $logfile
-# samtools faidx $reference_dir/genome.fa
+# Step 1.1 create index for the fasta file
+echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
+tee -a $logfile
+samtools faidx $reference_dir/genome.fa
 
-# # Step 2. download bam files and peaks file
+# Step 2. download bam files and peaks file
 
-# # 2.1 download unfiltered alignments bams
-# download_file "$unfiltered_alignments" "bam" \
-# "$unfiltered_alignments_md5sums" 1 $logfile $encode_access_key \
-# $encode_secret_key $downloads_dir
+# 2.1 download unfiltered alignments bams
+download_file "$unfiltered_alignments" "bam" \
+"$unfiltered_alignments_md5sums" 1 $logfile $encode_access_key \
+$encode_secret_key $downloads_dir
 
-# # 2.2 download alignments bams
-# download_file "$alignments" "bam" "$alignments_md5sums" 1 $logfile \
-# $encode_access_key $encode_secret_key $downloads_dir
+# 2.2 download alignments bams
+download_file "$alignments" "bam" "$alignments_md5sums" 1 $logfile \
+$encode_access_key $encode_secret_key $downloads_dir
 
-# if [ "$has_control" = "True" ]
-# then
-#     # 2.3 download control unfiltered alignmentsbams
-#     download_file "$control_unfiltered_alignments" "bam" \
-#     "$control_unfiltered_alignments_md5sums" 1 $logfile $encode_access_key \
-#     $encode_secret_key $downloads_dir
+if [ "$has_control" = "True" ]
+then
+    # 2.3 download control unfiltered alignmentsbams
+    download_file "$control_unfiltered_alignments" "bam" \
+    "$control_unfiltered_alignments_md5sums" 1 $logfile $encode_access_key \
+    $encode_secret_key $downloads_dir
 
-#     # 2.4 download control alignments bams
-#     download_file "$control_alignments" "bam" "$control_alignments_md5sums" 1 \
-#     $logfile $encode_access_key $encode_secret_key $downloads_dir
-# fi
+    # 2.4 download control alignments bams
+    download_file "$control_alignments" "bam" "$control_alignments_md5sums" 1 \
+    $logfile $encode_access_key $encode_secret_key $downloads_dir
+fi
 
-# # 2.5 download peaks file
-# download_file $peaks "bed.gz" $peaks_md5sum 1 $logfile $encode_access_key \
-# $encode_secret_key $downloads_dir
+# 2.5 download peaks file
+download_file $peaks "bed.gz" $peaks_md5sum 1 $logfile $encode_access_key \
+$encode_secret_key $downloads_dir
 
-# wait_for_jobs_to_finish "Download"
+wait_for_jobs_to_finish "Download"
 
-# # Step 3. preprocess
+# Step 3. preprocess
 
-# # 3.1 preprocess experiment bams
-# ./preprocessing.sh $experiment "$unfiltered_alignments" "$alignments" \
-# $downloads_dir $intermediates_dir $bigWigs_dir $stranded False $reference_dir \
-# $logfile &
+# 3.1 preprocess experiment bams
+./preprocessing.sh $experiment "$unfiltered_alignments" "$alignments" \
+$downloads_dir $intermediates_dir $bigWigs_dir $stranded False $reference_dir \
+$logfile &
 
-# echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
-# \"$unfiltered_alignments\" \"$alignments\" $downloads_dir $intermediates_dir \
-# $bigWigs_dir $stranded False $reference_dir $logfile  | tee -a $logfile
+echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
+\"$unfiltered_alignments\" \"$alignments\" $downloads_dir $intermediates_dir \
+$bigWigs_dir $stranded False $reference_dir $logfile  | tee -a $logfile
 
-# if [ "$has_control" = "True" ]
-# then
-#     # 3.2 preprocess experiment control bams
-#     ./preprocessing.sh $experiment "$control_unfiltered_alignments" \
-#     "$control_alignments" $downloads_dir $intermediates_dir $bigWigs_dir \
-#     $stranded True $reference_dir $logfile &
+if [ "$has_control" = "True" ]
+then
+    # 3.2 preprocess experiment control bams
+    ./preprocessing.sh $experiment "$control_unfiltered_alignments" \
+    "$control_alignments" $downloads_dir $intermediates_dir $bigWigs_dir \
+    $stranded True $reference_dir $logfile &
     
-#     echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
-#     \"$control_unfiltered_alignments\" \"$control_alignments\" $downloads_dir \
-#     $intermediates_dir $bigWigs_dir $stranded True $reference_dir $logfile | \
-#     tee -a $logfile
-# fi
+    echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
+    \"$control_unfiltered_alignments\" \"$control_alignments\" $downloads_dir \
+    $intermediates_dir $bigWigs_dir $stranded True $reference_dir $logfile | \
+    tee -a $logfile
+fi
 
-# wait_for_jobs_to_finish "Preprocessing"
+wait_for_jobs_to_finish "Preprocessing"
 
-# # Step pre_4: Create the input json for the experiment that will
-# # be used in training
-# echo $( timestamp ): "python create_input_json.py" $experiment $peaks True \
-# True $bigWigs_dir $downloads_dir . | tee -a $logfile
+# Step pre_4: Create the input json for the experiment that will
+# be used in training
+echo $( timestamp ): "python create_input_json.py" $experiment $peaks True \
+True $bigWigs_dir $downloads_dir . | tee -a $logfile
 
-# python create_input_json.py $experiment $peaks True True $bigWigs_dir \
-# $downloads_dir .
+python create_input_json.py $experiment $peaks True True $bigWigs_dir \
+$downloads_dir .
     
 # Step 4. Run 3M (Modeling, Metrics, Modisco)
 
