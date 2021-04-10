@@ -50,6 +50,10 @@ RUN rm requirements.txt
 # Install jq
 RUN apt-get install -y jq
 
+# Install BayesianOptimization
+
+RUN pip install bayesian-optimization
+
 # Clean up after apt and conda
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN conda clean -tipsy
