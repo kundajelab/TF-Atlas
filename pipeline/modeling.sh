@@ -41,7 +41,7 @@ train \\
     --input-seq-len 2114 \\
     --output-len 1000 \\
     --filters 64 \\
-    --threads 10 \\
+    --threads 2 \\
     --learning-rate $learning_rate \\
     --counts-loss-weight $counts_loss_weight" | tee -a $logfile
 
@@ -61,7 +61,7 @@ train \
     --input-seq-len 2114 \
     --output-len 1000 \
     --filters 64 \
-    --threads 10 \
+    --threads 2 \
     --learning-rate $learning_rate \
     --counts-loss-weight $counts_loss_weight
 
