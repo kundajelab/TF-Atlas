@@ -34,6 +34,13 @@ This notebook requires:
 		`input_seqs`: N x L x 4 array of one-hot encoded input sequences
 
 - Set of all peaks as ENCODE NarrowPeak format (used for distance distribution of seqlets to peak summits)
+- Path to a motif database to use for computing TOMTOM matches (in MEME format)
+- Optional path to directory where results of notebook are stored:
+	- An HDF5 of all TF-MoDISco motifs, including the PFMs, CWMs, and hypothetical CWMs (and trimmed versions of these)
+	- For the set of seqlets underlying each motif, a NumPy object of the set of true/predicted profiles, DNA sequences, hypothetical importance scores, coordinates, and distances to peak summits of these seqlets
+	- Plotted images of the full PFMS, CWMs, and hypothetical CWMs
+	- Plotted images of the true/predicted profiles surrounding the seqlets underlying each motif
+	- Plotted images of the distribution of distances of each underlying seqlet to the closest peak summit
 
 Note that the N sequences in the importance scores must be precisely those that TF-MoDISco was run on (in the exact order). N is the number of peaks, T is the number of tasks (for single task models, that is just 1), O is the output profile length (e.g. 1000bp), L is the input sequence length (e.g. 2114bp), and 2 is for the two strands.
 
