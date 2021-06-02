@@ -63,6 +63,16 @@ This notebook requires:
 - Optional path to directory where results of notebook are stored:
 	- Plotted images of the profiles, importance scores, and underlying seqlet
 
+### `cluster_motifs.ipynb`
+Given a set of motifs (perhaps from multiple TF-MoDISco runs), clusters them to show structure across all motifs.
+
+This notebook requires:
+- Comma-delimited list of paths to motif files, each one being an HDF5 of the same format as the motif HDF5 saved by `view_tfmodisco_results.ipynb`
+- Parallel comma-delimited list of group names (i.e. unique identifiers for each given motif file)
+- Optional path to directory where results of notebook are stored:
+	- Plotted image of heatmap with dendrogram showing motif clusters
+	- HDF5 containing the similarity matrix between all motifs, the distinct clusters, and the aggregated CWM of the cluster
+
 ### `summarize_motif_hits.ipynb`
 This notebook analyzes the resulting hits of the TF-MoDISco scoring algorithm. This notebook will visualize:
 - The distribution of how many motif hits are found per peak
