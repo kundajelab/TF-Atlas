@@ -2,7 +2,9 @@
 
 This directory contains Jupyter Notebooks and scripts needed to generate motif reports.
 
-Note that these reports are only compatible with the outputs of single-task models, so below, `T` (the number of tasks) will always be 1
+Note that these reports are only compatible with the outputs of single-task models, so below, `T` (the number of tasks) will always be 1.
+
+The convention used by these notebooks is to name each TF-MoDISco motif by the metacluster and pattern index (e.g. motif `0_5` is the 6th motif (index 5) in the first metacluster (index 0)).
 
 ### `view_tfmodisco_results.ipynb`
 Visualizes the TF-MoDISco motifs, including:
@@ -97,10 +99,31 @@ From the set of TF-MoDISco motifs and the motif hits in peaks, this notebook wil
 This notebook requires:
 - TF-MoDISco result HDF5
 - Importance scores HDF5 (same format as above)
-- Location where MOODS results were stored
-- Embeddings of peaks as an N x L x F array
-	- N is the number of peaks, L is the length along the final dilated convolutional axis, and F is the number of filters
-	- The peaks N must be in the same order as in the peaks BED file which was used to compute motif hits
+- Path to motif hits table (e.g. the output of `tfmodisco_hit_scoring.py` or the filtered table output by `summarize_motif_hits.ipynb`)
+- Set of all peaks as a single BED file in ENCODE NarrowPeak format
+	- This needs to be the exact same peak file that was used to call the TF-MoDISco hit scoring algorithm
+- Embeddings of peaks from the model as an HDF5 of the following format:
+
+		`coords`:
+		    `coords_chrom`: M-array of chromosome (string)
+		    `coords_start`: M-array
+		    `coords_end`: M-array
+		`predictions`:
+		    `mean`: M x C x F array of embeddings, where collapsing is done by
+				taking the mean across the output length (C convolutional layers
+				in order of the model, F filters)
+			`std`: M x C x F array of embeddings, collapsed using standard
+                deviation
+            `max`: M x C x F array of embeddings, collapsed using maximum
+            `min`: M x C x F array of embeddings, collapsed using minimum
+
+- Optional path to directory where results of notebook are stored:
+	- HDF5 mapping each motif key to the set of indices of embeddings (out of M) that correspond to peaks/regions that contain hits of that motif
+	- HDF5 of all motif subclusters: the PFM, CWM, hypothetical CWM, and trimmed hypothetical CWM of each sub-motif (of each motif)
+	- Plotted images of the trimmed hypothetical CWM of each submotif
+	- Plotted images of UMAPs showing the embeddings of the submotifs
+	- HDF5 of transformed peak embeddings in UMAP space
+	- Plotted images of UMAPs of peak embeddings for every layer and motif
 
 ### `model_performance.ipynb`
 Plots the profile and counts performance of a model, including:
