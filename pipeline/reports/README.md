@@ -2,6 +2,8 @@
 
 This directory contains Jupyter Notebooks and scripts needed to generate motif reports.
 
+Note that these reports are only compatible with the outputs of single-task models, so below, `T` (the number of tasks) will always be 1
+
 ### `view_tfmodisco_results.ipynb`
 Visualizes the TF-MoDISco motifs, including:
 - PFM, PWM, CWM, and hCWM of each discovered motif
@@ -56,6 +58,8 @@ This notebook requires:
 - TF-MoDISco result HDF5
 - Peak predictions HDF5 (same format as above)
 - Importance scores HDF5 (same format as above)
+- Optional path to directory where results of notebook are stored:
+	- Plotted images of the profiles, importance scores, and underlying seqlet
 
 ### `summarize_motif_hits.ipynb`
 For the set of TF-MoDISco motifs, this notebook will run MOODS motif instance calling and analyze the resulting hits. This notebook will visualize:
