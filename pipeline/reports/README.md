@@ -62,7 +62,7 @@ This notebook requires:
 	- Plotted images of the profiles, importance scores, and underlying seqlet
 
 ### `summarize_motif_hits.ipynb`
-For the set of TF-MoDISco motifs, this notebook will run MOODS motif instance calling and analyze the resulting hits. This notebook will visualize:
+This notebook analyzes the resulting hits of the TF-MoDISco scoring algorithm. This notebook will visualize:
 - The distribution of how many motif hits are found per peak
 - The proportion of peaks that have each type of motif
 - Example importance score tracks with highlighted motif hits
@@ -73,10 +73,21 @@ For the set of TF-MoDISco motifs, this notebook will run MOODS motif instance ca
 This notebook requires:
 - TF-MoDISco result HDF5
 - Importance scores HDF5 (same format as above)
-- Set of all peaks as ENCODE NarrowPeak format
-- A location to store the MOODS results
+- Set of all peaks as a single BED file in ENCODE NarrowPeak format
+	- This needs to be the exact same peak file that was used to call the TF-MoDISco hit scoring algorithm
+- Path to TF-MoDISco hit scoring output table (output by `tfmodisco_hit_scoring.py`)
+- Optional path to directory where results of notebook are stored:
+	- The filtered hits after FDR thresholding
+	- The set of all peaks
+	- The mapping between the index of each peak to the set of indices of the filtered hits belonging to that peak
+	- Plotted images of the FDR thresholding
+	- Plotted images of the CDF of hits per peak, bar plot of peaks with each motif, and homotypic density CDFs
+	- HDF5 of co-occurrence matrices of the different motifs in p-values and raw counts
+	- Plotted images of the co-occurrence heatmaps, and binary indicator matrix of which peaks have which motifs
+	- HDF5 of motif distance distributions between significantly co-occurring motifs
+	- Plotted image of distance distributions between significantly co-occurring motifs
 
-MOODS calling is performed by `moods.py`.
+Note that before running this notebook, `tfmodisco_hit_scoring.py` must be run.
 
 ### `cluster_motif_hits_and_peaks.ipynb`
 From the set of TF-MoDISco motifs and the motif hits in peaks, this notebook will visualize:
