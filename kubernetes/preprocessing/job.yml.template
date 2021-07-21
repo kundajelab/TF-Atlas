@@ -1,30 +1,27 @@
- apiVersion: batch/v1
- kind: Job
- metadata:
-   name: tfatlas-preprocessing-{}
- spec:
-   template:
-     spec:
-       containers:
-       - name: tfatlas-preprocessing-preprocessing-{}
-         image: kundajelab/tf-atlas:gcp
-         imagePullPolicy: Always
-         resources:
-           requests:
-             memory: 10Gi
-             cpu: 3
-           limits:
-             memory: 15Gi
-             cpu: 3
-         command:
-         - /bin/bash
-         - -c
-         args:
-         - gsutil cp gs://tfatlas/run_preprocessing_pipeline.sh /tfatlas;
-           cd /tfatlas;
-           chmod +x run_preprocessing_pipeline.sh;
-           ./run_preprocessing_pipeline.sh {} HBZNC72F dxjvsz3pfvnaqoxw tfatlas /tfatlas metadata_HepG2.tsv
-       restartPolicy: Never
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tfatlas-preprocessing-{}
+spec:
+  template:
+    spec:
+      containers:
+      - name: tfatlas-preprocessing-preprocessing-{}
+        image: kundajelab/tf-atlas:gcp-preprocessing
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 12Gi
+            cpu: 3
+          limits:
+            memory: 15Gi
+            cpu: 3
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - bash run_preprocessing_pipeline.sh <> HBZNC72F dxjvsz3pfvnaqoxw tfatlas /tfatlas metadata_HepG2.tsv
+      restartPolicy: Never
       nodeSelector:
         cloud.google.com/gke-nodepool: preprocessing
-   backoffLimit: 0
+  backoffLimit: 0

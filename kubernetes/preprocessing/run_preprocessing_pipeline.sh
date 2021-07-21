@@ -27,9 +27,6 @@ $project_dir/metadata.tsv | tee -a $logfile
 
 gsutil cp $metadata_file_path $project_dir/metadata.tsv
 
-# change directory to the pipeline folder
-cd $project_dir/TFAtlas/kubernetes/preprocessing
-
 # create pipeline params json
 echo $( timestamp ): "
 python \\

@@ -10,7 +10,8 @@ with open(template_path, 'r') as f:
     
 # replace '{}' in the template with experiment name
 for experiment in experiments.split():
-    yml_str = template_str.replace('{}', experiment)
+    yml_str = template_str.replace('{}', experiment.lower())
+    yml_str = yml_str.replace('<>', experiment)
     
     # write to new yaml file
     yaml_fname = 'job_{}.yml'.format(experiment)
