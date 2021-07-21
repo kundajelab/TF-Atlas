@@ -156,7 +156,7 @@ def import_peak_table(peak_bed_paths):
 
 
 BACKGROUND_FREQS = np.array([0.25, 0.25, 0.25, 0.25])
-def info_content(track, pseudocount=0.001):
+def pfm_info_content(track, pseudocount=0.001):
     """
     Given an L x 4 track, computes information content for each base and
     returns it as an L-array.
@@ -169,11 +169,11 @@ def info_content(track, pseudocount=0.001):
 
 
 def pfm_to_pwm(pfm):
-    ic = info_content(pfm)
+    ic = pfm_info_content(pfm)
     return pfm * np.expand_dims(ic, axis=1)
 
 
-def trim_motif(pfm, motif, min_ic=0.2, pad=0):
+def trim_motif_by_ic(pfm, motif, min_ic=0.2, pad=0):
     """
     Given the PFM and motif (both L x 4 arrays) (the motif could be the
     PFM itself), trims `motif` by cutting off flanks of low information
@@ -183,7 +183,7 @@ def trim_motif(pfm, motif, min_ic=0.2, pad=0):
     If no base passes the `min_ic` threshold, then no trimming is done.
     """
     # Trim motif based on information content
-    ic = info_content(pfm)
+    ic = pfm_info_content(pfm)
     pass_inds = np.where(ic >= min_ic)[0]  # Cut off flanks with less than min_ic IC
     
     if not pass_inds.size:

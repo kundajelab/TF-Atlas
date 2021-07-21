@@ -7,7 +7,7 @@ arch_name=$2
 seqgen_name=$3
 splits_file_path=$4
 peaks=$5
-learning_rat=$6
+learning_rate=$6
 counts_loss_weight=$7
 epochs=$8
 reference_dir=$9
@@ -41,7 +41,7 @@ train \\
     --input-seq-len 2114 \\
     --output-len 1000 \\
     --filters 64 \\
-    --threads 10 \\
+    --threads 2 \\
     --learning-rate $learning_rate \\
     --counts-loss-weight $counts_loss_weight" | tee -a $logfile
 
@@ -61,7 +61,7 @@ train \
     --input-seq-len 2114 \
     --output-len 1000 \
     --filters 64 \
-    --threads 10 \
+    --threads 2 \
     --learning-rate $learning_rate \
     --counts-loss-weight $counts_loss_weight
 
