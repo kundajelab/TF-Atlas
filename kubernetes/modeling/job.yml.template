@@ -23,5 +23,5 @@ spec:
         - bash modeling_pipeline.sh <> tfatlas /tfatlas/TF-Atlas/kubernetes/modeling
       restartPolicy: Never
       nodeSelector:
-        cloud.google.com/gke-nodepool: preprocessing-high
+        cloud.google.com/gke-nodepool: pool-1
   backoffLimit: 0

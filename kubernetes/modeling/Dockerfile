@@ -1,5 +1,5 @@
 # Use the official TensorFlow image as parent
-FROM tensorflow/tensorflow-gpu:2.4.1
+FROM tensorflow/tensorflow:2.4.1-gpu
 
 # Create /tfatlas directory and subdirectories
 RUN mkdir -p /tfatlas
