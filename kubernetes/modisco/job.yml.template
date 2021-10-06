@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tfatlas-modisco-{}
+spec:
+  template:
+    spec:
+      containers:
+      - name: tfatlas-modisco-gpu-{}
+        image: kundajelab/tf-atlas:gcp-modisco
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 25Gi
+            cpu: 7
+          limits:
+            memory: 30Gi
+            cpu: 7
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - bash modeling_pipeline.sh <> tfatlas /tfatlas/TF-Atlas/kubernetes/modisco
+      restartPolicy: Never
+      nodeSelector:
+        cloud.google.com/gke-nodepool: processing-high
+  backoffLimit: 0

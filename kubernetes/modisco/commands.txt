@@ -1,0 +1,5 @@
+gcloud container clusters get-credentials tfatlas --zone us-central1-c
+kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded.yaml
+
+docker build --no-cache /users/zahoor/TF-Atlas/TF-Atlas/kubernetes/modisco -t kundajelab/tf-atlas:gcp-modisco
+docker push kundajelab/tf-atlas:gcp-modisco
