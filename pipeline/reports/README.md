@@ -101,14 +101,22 @@ This notebook requires:
 
 Note that before running this notebook, `tfmodisco_hit_scoring.py` must be run.
 
-### `cluster_motif_hits_and_peaks.ipynb`
-From the set of TF-MoDISco motifs and the motif hits in peaks, this notebook will visualize:
-- Subclustering structure within motifs themselves
-- Clustering of peak embeddings based on which peaks contain which motifs
+### `submotif_clustering.ipynb`
+From the set of TF-MoDISco motifs, this notebook will visualize the subclustering structure of submotifs within the motifs themselves.
 
 This notebook requires:
 - TF-MoDISco result HDF5
 - Importance scores HDF5 (same format as above)
+- Optional path to directory where results of notebook are stored:
+	- HDF5 of all motif subclusters (the PFM, CWM, hypothetical CWM, and trimmed hypothetical CWM of each sub-motif for each motif), and the transformed submotif embeddings for each motif
+	- Plotted images of the trimmed hypothetical CWM of each submotif 
+	- Plotted images of UMAPs showing the embeddings of the submotifs
+
+### `cluster_motif_hits_and_peaks.ipynb`
+From the set of TF-MoDISco motifs and the motif hits in peaks, this notebook will visualize the clustering of peak embeddings based on which peaks contain which motifs
+
+This notebook requires:
+- TF-MoDISco result HDF5
 - Path to motif hits table (e.g. the output of `tfmodisco_hit_scoring.py` or the filtered table output by `summarize_motif_hits.ipynb`)
 - Set of all peaks as a single BED file in ENCODE NarrowPeak format
 	- This needs to be the exact same peak file that was used to call the TF-MoDISco hit scoring algorithm
@@ -129,8 +137,6 @@ This notebook requires:
 
 - Optional path to directory where results of notebook are stored:
 	- HDF5 mapping each motif key to the set of indices of embeddings (out of M) that correspond to peaks/regions that contain hits of that motif
-	- HDF5 of all motif subclusters: the PFM, CWM, hypothetical CWM, and trimmed hypothetical CWM of each sub-motif (of each motif)
-	- Plotted images of the trimmed hypothetical CWM of each submotif
 	- Plotted images of UMAPs showing the embeddings of the submotifs
 	- HDF5 of transformed peak embeddings in UMAP space
 	- Plotted images of UMAPs of peak embeddings for every layer and motif

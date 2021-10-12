@@ -2,6 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 from modisco.hit_scoring import densityadapted_hitscoring
+from modisco.util import compute_per_position_ic
+import util
 import click
 
 def import_tfmodisco_hits(hits_bed):
@@ -14,9 +16,9 @@ def import_tfmodisco_hits(hits_bed):
         hits_bed, sep="\t", header=None, index_col=False,
         names=[
             "chrom", "start", "end", "key", "strand", "peak_index",
-            "imp_total_score", "imp_frac_score", "agg_sim", "mod_delta",
-            "mod_precision", "mod_percentile", "fann_perclasssum_perc",
-            "fann_perclassavg_perc"
+            "imp_total_signed_score", "imp_total_score", "imp_frac_score",
+            "imp_ic_avg_score", "agg_sim", "mod_delta", "mod_precision",
+            "mod_percentile", "fann_perclasssum_perc", "fann_perclassavg_perc"
         ]
     )
     return hit_table
@@ -38,20 +40,41 @@ def import_tfmodisco_hits(hits_bed):
     "-c", "--center-cut-size", default=400,
     help="Length of sequence that was used to run TF-MoDISco"
 )
+@click.option(
+    "--keep-non-acgt", is_flag=True,
+    help="If given, don't remove non-ACGT score tracks"
+)
+@click.option(
+    "-m", "--min-ic", default=0.2,
+    help="Information content cut-off to use to trim motif hits"
+)
+@click.option(
+    "-mc", "--metacluster-ind", default=0,
+    help="Index of the metacluster whose patterns to use for motif assignment; defaults to metacluster 0"
+)
+@click.option(
+    "-p", "--pattern-inds", default=None, type=str,
+    help="Comma-delimited list of pattern indices in the metacluster to use for motif assignment; defaults to all patterns in the metacluster"
+)
 @click.argument("shap_scores_path", nargs=1)
 @click.argument("tfm_results_path", nargs=1)
 @click.argument("peak_bed_path", nargs=1)
 def main(
     shap_scores_path, tfm_results_path, peak_bed_path, outdir, hyp_score_key,
-    input_length, center_cut_size
+    input_length, center_cut_size, keep_non_acgt, min_ic, metacluster_ind,
+    pattern_inds
 ):
+    assert metacluster_ind in (0, 1)
+    if pattern_inds is not None:
+        pattern_inds = [int(x) for x in pattern_inds.split(",")]
+
     os.makedirs(outdir, exist_ok=True)
 
     print("Importing DeepSHAP scores and TF-MoDISco results...")
     hyp_scores, act_scores, one_hot_seqs, imp_coords = \
         util.import_shap_scores(
             shap_scores_path, hyp_score_key, center_cut_size=center_cut_size,
-            remove_non_acgt=False
+            remove_non_acgt=(not keep_non_acgt)
     )
     tfm_results = util.import_tfmodisco_results(
         tfm_results_path, hyp_scores, one_hot_seqs, center_cut_size
@@ -110,22 +133,37 @@ def main(
     print("Preparing the hit scorer...")
     # Only do the first metacluster (positive scores)
     patterns = tfm_results.metacluster_idx_to_submetacluster_results[
-        "metacluster_0"
+        "metacluster_%d" % metacluster_ind
     ].seqlets_to_patterns_result.patterns
-    
+
+    # If specified, use only specific patterns in the metacluster
+    if pattern_inds is None:
+        pattern_inds = list(range(len(patterns)))
+    else:
+        patterns = [patterns[i] for i in pattern_inds]
+
+    bg_freq = np.mean(one_hot_seqs_matched, axis=(0, 1))
+        
+    # Verify that every pattern has sufficiently high IC
+    for pattern in patterns:
+        pfm = pattern["sequence"].fwd
+        ic = compute_per_position_ic(pfm, bg_freq, 0.001)
+        assert np.sum(ic >= min_ic) > 0, "The given IC threshold results in an empty motif"
+
     # Instantiate the hit scorer
     hit_scorer = densityadapted_hitscoring.MakeHitScorer(
         patterns=patterns,
         target_seqlet_size=25,
-        bg_freq=np.mean(one_hot_seqs_matched, axis=(0, 1)),
-        task_names_and_signs=[("task0", 1)],
-        n_cores=10
+        bg_freq=bg_freq,
+        task_names_and_signs=[("task0", 1 if metacluster_ind == 0 else -1)],
+        n_cores=10,
+        additional_seqletscorer_kwargs={"ic_trim_threshold": min_ic}
     )
     
     # Set seqlet identification method
     hit_scorer.set_coordproducer(
         contrib_scores={"task0": act_scores_matched},
-        core_sliding_window_size=7,
+        core_sliding_window_size=5,
         target_fdr=0.2,
         min_passing_windows_frac=0.03,
         max_passing_windows_frac=0.2,
@@ -134,7 +172,7 @@ def main(
     )
 
     # Map pattern index to motif key
-    motif_keys = ["0_%d" % i for i in range(len(patterns))]
+    motif_keys = ["%d_%d" % (metacluster_ind, i) for i in pattern_inds]
 
     print("Starting hit scoring...")
     batch_size = 1024
@@ -156,17 +194,16 @@ def main(
             for match in match_list:
                 rows.append([
                     match.exampleidx + offset, match.patternidx, match.start,
-                    match.end, match.is_revcomp, match.total_importance,
-                    match.aggregate_sim, match.mod_delta, match.mod_precision,
-                    match.mod_percentile, match.fann_perclasssum_perc,
-                    match.fann_perclassavg_perc
+                    match.end, match.is_revcomp, match.aggregate_sim,
+                    match.mod_delta, match.mod_precision, match.mod_percentile,
+                    match.fann_perclasssum_perc, match.fann_perclassavg_perc
                 ])
     
     # Collate the matches together into a big table
     colnames = [
         "example_index", "pattern_index", "start", "end", "revcomp",
-        "imp_total_score", "agg_sim", "mod_delta", "mod_precision",
-        "mod_percentile", "fann_perclasssum_perc", "fann_perclassavg_perc"
+        "agg_sim", "mod_delta", "mod_precision", "mod_percentile",
+        "fann_perclasssum_perc", "fann_perclassavg_perc"
     ]
     match_table = pd.DataFrame(rows, columns=colnames)
 
@@ -177,11 +214,6 @@ def main(
     )
 
     print("Cleaning up matches...")
-    # Compute importance fraction of each hit, using just the matched actual scores
-    total_track_imp = np.sum(np.abs(act_scores_matched), axis=(1, 2))
-    match_table["imp_frac_score"] = match_table["imp_total_score"] / \
-        total_track_imp[match_table["example_index"]]
-
     # Convert example index to peak index
     match_table["peak_index"] = example_to_peak_index[
         match_table["example_index"]
@@ -193,6 +225,10 @@ def main(
     # Convert revcomp to strand
     # Note we are assuming that the input scores were all positive strand
     match_table["strand"] = match_table["revcomp"].map({True: "-", False: "+"})
+
+    # Save the start/end as other columns, which match the score coordinates
+    match_table["score_start"] = match_table["start"]
+    match_table["score_end"] = match_table["end"]
     
     # Convert start/end of motif hit to genomic coordinate
     # `peak_starts[i] == j` is such that if `i` is a peak index, `j` is the peak
@@ -211,12 +247,83 @@ def main(
     match_table["start"] = match_table["start"] + offset + peak_starts
     match_table["end"] = match_table["end"] + offset + peak_starts
 
+    # Trim each motif hit to be only the size of the core motif (determined by
+    # IC)
+    ic_dict = {}  # Save (trimmed) IC for each motif
+    hit_patterns = hit_scorer.trimmed_subclustered_patterns
+    for i, pattern in enumerate(hit_patterns):
+        motif_key = motif_keys[i]
+        pfm = pattern["sequence"].fwd
+        ic = compute_per_position_ic(pfm, bg_freq, 0.001)
+        pass_inds = np.where(ic >= min_ic)[0]
+        if not pass_inds.size:
+            continue
+
+        start, end = np.min(pass_inds), np.max(pass_inds) + 1
+        length = end - start
+        rc_start = len(pfm) - end
+
+        ic_dict[motif_key] = ic[start:end]
+
+        motif_mask = match_table["key"] == motif_key
+        pos_mask = match_table["strand"] == "+"
+        match_table.loc[motif_mask & pos_mask, "start"] = \
+            match_table[motif_mask & pos_mask]["start"] + start
+        match_table.loc[motif_mask & pos_mask, "end"] = \
+            match_table[motif_mask & pos_mask]["start"] + length
+        match_table.loc[motif_mask & pos_mask, "score_start"] = \
+            match_table[motif_mask & pos_mask]["score_start"] + start
+        match_table.loc[motif_mask & pos_mask, "score_end"] = \
+            match_table[motif_mask & pos_mask]["score_start"] + length
+
+        match_table.loc[motif_mask & (~pos_mask), "start"] = \
+            match_table[motif_mask & (~pos_mask)]["start"] + rc_start
+        match_table.loc[motif_mask & (~pos_mask), "end"] = \
+            match_table[motif_mask & (~pos_mask)]["start"] + length
+        match_table.loc[motif_mask & (~pos_mask), "score_start"] = \
+            match_table[motif_mask & (~pos_mask)]["score_start"] + rc_start
+        match_table.loc[motif_mask & (~pos_mask), "score_end"] = \
+            match_table[motif_mask & (~pos_mask)]["score_start"] + length
+
+    # For each hit, compute the total absolute importance, fraction absolute
+    # importance, and IC-weighted importance average
+    match_table["imp_total_score"] = np.nan
+    match_table["imp_total_signed_score"] = np.nan
+    match_table["imp_ic_avg_score"] = np.nan
+    score_length = act_scores_matched.shape[1]
+    for i, row in match_table.iterrows():
+        if row["score_start"] < 0 or row["score_end"] >= score_length:
+            print("Hit at %s:%d-%d is outside of importance score range" % (
+                row["chrom"], row["start"], row["end"]
+            ))
+            continue
+        scores = np.sum(act_scores_matched[
+            row["example_index"], row["score_start"]:row["score_end"]
+        ], axis=1)  # Flatten from L x 4 to L-array
+        match_table.loc[i, "imp_total_score"] = np.sum(np.abs(scores))
+        match_table.loc[i, "imp_total_signed_score"] = np.sum(scores)
+
+        ic = ic_dict[row["key"]]
+        if row["strand"] == "-":
+            ic = np.flip(ic)
+
+        match_table.loc[i, "imp_ic_avg_score"] = np.mean(ic * scores)
+
+    # Compute the fraction importance by dividing total importance
+    total_track_imp = np.sum(np.abs(act_scores_matched), axis=(1, 2))
+    match_table["imp_frac_score"] = match_table["imp_total_score"] / \
+        total_track_imp[match_table["example_index"]]
+
+    # Filter out any hits that had NaN as an importance score; these hits
+    # overran the importance score track boundaries
+    match_table = match_table.dropna(subset=["imp_total_score"])
+
     # Re-order columns (and drop a few) before saving the result
     match_table = match_table[[
         "chrom", "start", "end", "key", "strand", "peak_index",
-        "imp_total_score", "imp_frac_score", "agg_sim", "mod_delta",
-        "mod_precision", "mod_percentile", "fann_perclasssum_perc",
-        "fann_perclassavg_perc"
+        "imp_total_signed_score", "imp_total_score", "imp_frac_score",
+        "imp_ic_avg_score", "agg_sim", "mod_delta", "mod_precision",
+        "mod_percentile", "fann_perclasssum_perc", "fann_perclassavg_perc"
     ]]
     match_table.to_csv(
         os.path.join(outdir, "tfm_matches.bed"), sep="\t", header=False,
