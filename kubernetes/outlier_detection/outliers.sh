@@ -50,11 +50,11 @@ gsutil cp gs://$2/input_json/input.json $project_dir/
 
 # modify the input json for this experiment
 echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/input_outliers.json 
-sed -i -e "s/<>/$1/g" $project_dir/input.json | tee -a $logfile 
+sed -i -e "s/<>/$1/g" $project_dir/input_outliers.json  | tee -a $logfile 
 
 echo $( timestamp ): "
 outliers \\
-    --input-data $project_dir/input.json \\
+    --input-data $project_dir/input_outliers.json  \\
     --quantile 0.99 \\
     --quantile-value-scale-factor 1.2 \\
     --task 0 \\
@@ -64,7 +64,7 @@ outliers \\
     --output-bed ${experiment}_inliers.bed" | tee -a $logfile 
     
 outliers \
-    --input-data $project_dir/input.json \
+    --input-data $project_dir/input_outliers.json  \
     --quantile 0.99 \
     --quantile-value-scale-factor 1.2 \
     --task 0 \
