@@ -89,10 +89,10 @@ This notebook requires:
 	- This needs to be the exact same peak file that was used to call the TF-MoDISco hit scoring algorithm
 - Path to TF-MoDISco hit scoring output table (output by `tfmodisco_hit_scoring.py`)
 - Optional path to directory where results of notebook are stored:
-	- The filtered hits after FDR thresholding
+	- The motif hit table after thresholding for weak hits of low importance or low cluster similarity
 	- The set of all peaks
 	- The mapping between the index of each peak to the set of indices of the filtered hits belonging to that peak
-	- Plotted images of the FDR thresholding
+	- Plotted images of the importance/similarity thresholding for filtering the motif hits
 	- Plotted images of the CDF of hits per peak, bar plot of peaks with each motif, and homotypic density CDFs
 	- HDF5 of co-occurrence matrices of the different motifs in p-values and raw counts
 	- Plotted images of the co-occurrence heatmaps, and binary indicator matrix of which peaks have which motifs
