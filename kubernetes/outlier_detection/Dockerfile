@@ -55,4 +55,5 @@ ENV LANG=C.UTF-8
 RUN git clone https://github.com/kundajelab/TF-Atlas.git
 
 # cd into the TF-Atlas kubernetes
-WORKDIR /tfatlas/TF-Atlas/kubernetes/outliers
+WORKDIR /tfatlas/TF-Atlas/kubernetes/outlier_detection
+

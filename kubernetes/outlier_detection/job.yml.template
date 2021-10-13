@@ -11,11 +11,11 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: 12Gi
-            cpu: 3
+            memory: 25Gi
+            cpu: 7
           limits:
-            memory: 15Gi
-            cpu: 3
+            memory: 30Gi
+            cpu: 7
         command:
         - /bin/bash
         - -c
@@ -23,5 +23,5 @@ spec:
         - bash outliers.sh <> tfatlas /tfatlas/TF-Atlas/kubernetes/outliers
       restartPolicy: Never
       nodeSelector:
-        cloud.google.com/gke-nodepool: preprocessing
+        cloud.google.com/gke-nodepool: pool-1
   backoffLimit: 0
