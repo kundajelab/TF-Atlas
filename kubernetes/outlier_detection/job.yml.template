@@ -20,7 +20,7 @@ spec:
         - /bin/bash
         - -c
         args:
-        - bash outliers.sh <> tfatlas /tfatlas/TF-Atlas/kubernetes/outliers
+        - bash outliers.sh <> tfatlas /tfatlas/TF-Atlas/kubernetes/outlier_detection
       restartPolicy: Never
       nodeSelector:
         cloud.google.com/gke-nodepool: pool-1

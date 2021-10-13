@@ -1,5 +1,5 @@
 # Use the official TensorFlow image as parent
-FROM tensorflow/tensorflow:2.4.1
+FROM tensorflow/tensorflow:2.4.1-gpu
 
 # Create /tfatlas directory and subdirectories
 RUN mkdir -p /tfatlas
@@ -50,6 +50,9 @@ RUN conda clean -tipsy
 # Set environment variables for Python
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
+
+# Install BPNet repo
+RUN pip install git+https://github.com/kundajelab/basepairmodels.git@new-tasks-format
 
 # Copy down the TF-Atlas scripts
 RUN git clone https://github.com/kundajelab/TF-Atlas.git
