@@ -44,9 +44,9 @@ tee -a $logfile
 gsutil cp gs://$2/reference/chrom.sizes $reference_dir
 
 # download input json
-echo $( timestamp ): "gsutil cp" gs://$2/input_json/input.json $project_dir | \
+echo $( timestamp ): "gsutil cp" gs://$2/input_json/input_outliers.json  $project_dir | \
 tee -a $logfile 
-gsutil cp gs://$2/input_json/input.json $project_dir/
+gsutil cp gs://$2/input_json/input_outliers.json $project_dir/
 
 # modify the input json for this experiment
 echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/input_outliers.json 
