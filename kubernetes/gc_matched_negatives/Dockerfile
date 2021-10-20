@@ -51,9 +51,6 @@ RUN conda clean -tipsy
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
-# Install BPNet repo
-RUN pip install git+https://github.com/kundajelab/basepairmodels.git@new-tasks-format
-
 # Copy down the TF-Atlas scripts
 RUN git clone https://github.com/kundajelab/TF-Atlas.git
 
