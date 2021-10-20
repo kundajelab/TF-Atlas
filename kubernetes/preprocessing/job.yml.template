@@ -20,7 +20,7 @@ spec:
         - /bin/bash
         - -c
         args:
-        - bash run_preprocessing_pipeline.sh <> HBZNC72F dxjvsz3pfvnaqoxw tfatlas /tfatlas metadata_HepG2.tsv
+        - bash run_preprocessing_pipeline.sh <> HBZNC72F dxjvsz3pfvnaqoxw tfatlas/[] /tfatlas metadata_K562.tsv
       restartPolicy: Never
       nodeSelector:
         cloud.google.com/gke-nodepool: preprocessing
