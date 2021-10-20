@@ -59,15 +59,15 @@ python /tfatlas/SVM_pipelines/make_inputs/get_gc_content.py \
        --store_seq
 
 echo $( timestamp ): "bedtools intersect -v -a" $reference_dir/gc_hg38_nosmooth.tsv \
-"-b" $data_dir/${1}_inliers.bed > $data_dir/$experiment.tsv  | tee -a $logfile 
+"-b" $data_dir/${1}_inliers.bed > $data_dir/${experiment}.tsv  | tee -a $logfile 
 
 bedtools intersect -v -a $reference_dir/gc_hg38_nosmooth.tsv \
--b $data_dir/${1}_inliers.bed > $data_dir/$experiment.tsv
+-b $data_dir/${1}_inliers.bed > $data_dir/${experiment}.tsv
 
 echo $( timestamp ): "
 python /tfatlas/SVM_pipelines/SVM_pipelines/make_inputs/get_chrom_gc_region_dict.py \\
-    --input_bed $data_dir/$experiment.tsv \\
-    --outf $data_dir/$experiment.gc.p" | tee -a $logfile 
+    --input_bed $data_dir/${experiment}.tsv \\
+    --outf $data_dir/${experiment}.gc.p" | tee -a $logfile 
 
 python /tfatlas/SVM_pipelines/SVM_pipelines/make_inputs/get_chrom_gc_region_dict.py \
     --input_bed $data_dir/$experiment.tsv \
