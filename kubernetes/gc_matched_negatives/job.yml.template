@@ -20,7 +20,7 @@ spec:
         - /bin/bash
         - -c
         args:
-        - bash outliers.sh <> tfatlas/[] /tfatlas/TF-Atlas/kubernetes/gc_matched_negatives
+        - bash gc_negatives.sh <> tfatlas/[] /tfatlas/TF-Atlas/kubernetes/gc_matched_negatives
       restartPolicy: Never
       nodeSelector:
         cloud.google.com/gke-nodepool: preprocessing
