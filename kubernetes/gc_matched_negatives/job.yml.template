@@ -11,10 +11,10 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: 12Gi
+            memory: 10Gi
             cpu: 3
           limits:
-            memory: 15Gi
+            memory: 12Gi
             cpu: 3
         command:
         - /bin/bash
