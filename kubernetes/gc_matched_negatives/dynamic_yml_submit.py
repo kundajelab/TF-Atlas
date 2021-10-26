@@ -4,6 +4,7 @@ import sys
 template_path = sys.argv[1]
 experiments = sys.argv[2]
 encode_version = sys.argv[3]
+postives_to_negatives_ratio = sys.argv[4]
 
 # read contents of template file as string
 with open(template_path, 'r') as f:
@@ -14,6 +15,7 @@ for experiment in experiments.split():
     yml_str = template_str.replace('{}', experiment.lower())
     yml_str = yml_str.replace('<>', experiment)
     yml_str = yml_str.replace('[]', encode_version)
+    yml_str = yml_str.replace('^^', postives_to_negatives_ratio)
     
     # write to new yaml file
     yaml_fname = 'job_{}.yml'.format(experiment)
