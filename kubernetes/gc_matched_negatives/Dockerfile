@@ -54,10 +54,6 @@ ENV LANG=C.UTF-8
 # Copy down the TF-Atlas scripts
 RUN git clone https://github.com/kundajelab/TF-Atlas.git
 
-# Copy down SVM_pipelines scripts, we'll use the scripts in make_inputs 
-# to generate gc matched negatives
-RUN git clone https://github.com/kundajelab/SVM_pipelines.git
-
 # cd into the TF-Atlas kubernetes
 WORKDIR /tfatlas/TF-Atlas/kubernetes/gc_matched_negatives
 
