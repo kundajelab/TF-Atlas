@@ -17,7 +17,7 @@ logfile=$project_dir/${1}_preprocessing.log
 touch $logfile
 
 # path to the metadata file in the gcp bucket
-metadata_file_path=gs://tfatlas/metadata/$metadata
+metadata_file_path=gs://$gcp_bucket/metadata/$metadata
 echo $( timestamp ): "metadata_file_path - " $metadata_file_path | \
 tee -a $logfile
 
