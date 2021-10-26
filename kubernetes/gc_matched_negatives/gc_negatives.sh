@@ -12,6 +12,7 @@ function timestamp {
 experiment=$1
 gcp_bucket=$2
 project_dir=$3
+ratio=$4
 
 # create the log file
 logfile=$project_dir/${1}_gc_matched_negatives.log
@@ -39,10 +40,10 @@ gsutil -m cp gs://$gcp_bucket/reference/* $reference_dir/
 # create index for the fasta file
 echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
 tee -a $logfile
-samtools faidx $reference_dir/genome.fa
+samtools faidx $reference_dir/hg38.genome.fa
 
 echo $( timestamp ): "
-python /tfatlas/SVM_pipelines/make_inputs/get_gc_content.py \\
+python get_gc_content.py \\
        --input_bed $data_dir/${1}_inliers.bed \\
        --ref_fasta $reference_dir/hg38.genome.fa \\
        --out_prefix $data_dir/$experiment.gc \\
@@ -50,7 +51,7 @@ python /tfatlas/SVM_pipelines/make_inputs/get_gc_content.py \\
        --flank_size 1057 \\
        --store_seq" | tee -a $logfile 
 
-python /tfatlas/SVM_pipelines/make_inputs/get_gc_content.py \
+python get_gc_content.py \
        --input_bed $data_dir/${1}_inliers.bed \
        --ref_fasta $reference_dir/hg38.genome.fa \
        --out_prefix $data_dir/$experiment.gc \
@@ -65,11 +66,11 @@ bedtools intersect -v -a $reference_dir/gc_hg38_nosmooth.tsv \
 -b $data_dir/${1}_inliers.bed > $data_dir/${experiment}.tsv
 
 echo $( timestamp ): "
-python /tfatlas/SVM_pipelines/SVM_pipelines/make_inputs/get_chrom_gc_region_dict.py \\
+python get_chrom_gc_region_dict.py \\
     --input_bed $data_dir/${experiment}.tsv \\
     --outf $data_dir/${experiment}.gc.p" | tee -a $logfile 
 
-python /tfatlas/SVM_pipelines/SVM_pipelines/make_inputs/get_chrom_gc_region_dict.py \
+python get_chrom_gc_region_dict.py \
     --input_bed $data_dir/$experiment.tsv \
     --outf $data_dir/${experiment}.gc.p
 
@@ -83,7 +84,38 @@ python create_negatives_bed.py \\
 python create_negatives_bed.py \
     --out-bed $data_dir/${experiment}_negatives.bed \
     --neg-pickle $data_dir/${experiment}.gc.p \
-    --ref-fasta $reference_dir/hg38.genome.fa1 \
+    --ref-fasta $reference_dir/hg38.genome.fa \
     --peaks $data_dir/${experiment}.gc
 
+# select negatives based on specified ratio
 
+# count the number of lines in the bed file
+echo $( timestamp ): "num_negatives=`cat $data_dir/${experiment}_negatives.bed | wc -l`" | tee -a $logfile 
+num_negatives=`cat $data_dir/${experiment}_negatives.bed | wc -l`
+
+# number of lines to select
+echo $( timestamp ): "num_select=($num_negatives / $ratio)" | tee -a $logfile 
+num_select=$(( num_negatives / ratio ))
+
+# select random rows
+echo $( timestamp ): "shuf -n" $num_select $data_dir/${experiment}_negatives.bed \
+">" $data_dir/${experiment}_negatives_select.bed | tee -a $logfile 
+shuf -n $num_select $data_dir/${experiment}_negatives.bed > \
+    $data_dir/${experiment}_negatives_select.bed
+
+# combine the gc matched negatives and the original peaks file into 
+# a single file
+echo $( timestamp ): "cat" $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives_select.bed ">" \
+    $data_dir/${experiment}_combined_1_${ratio}.bed  | tee -a $logfile 
+
+cat $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives_select.bed > \
+    $data_dir/${experiment}_combined_1_${ratio}.bed
+
+# copy combined bed file to gcp
+echo $( timestamp ): "gsutil cp" $data_dir/${experiment}_combined_1_${ratio}.bed  gs://$2/data/$1/ | \
+tee -a $logfile
+gsutil cp $data_dir/${experiment}_combined_1_${ratio}.bed  gs://$2/data/$1/
+
+# copy log file to gcp
+echo $( timestamp ): "gsutil cp" $logfile gs://$2/logs/ | tee -a $logfile 
+gsutil cp $logfile gs://$2/logs/
