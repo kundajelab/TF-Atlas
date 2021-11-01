@@ -33,59 +33,48 @@ echo $( timestamp ): "gsutil cp" gs://$2/data/$1/${1}_inliers.bed $data_dir | \
 tee -a $logfile
 gsutil cp gs://$2/data/$1/$1_inliers.bed  $data_dir
 
-echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/* \
-$reference_dir/ | tee -a $logfile
-gsutil -m cp gs://$gcp_bucket/reference/* $reference_dir/
+# echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/* \
+# $reference_dir/ | tee -a $logfile
+# gsutil -m cp gs://$gcp_bucket/reference/* $reference_dir/
 
-# create index for the fasta file
-echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
-tee -a $logfile
-samtools faidx $reference_dir/hg38.genome.fa
+# # create index for the fasta file
+# echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
+# tee -a $logfile
+# samtools faidx $reference_dir/hg38.genome.fa
 
 echo $( timestamp ): "
 python get_gc_content.py \\
        --input_bed $data_dir/${1}_inliers.bed \\
        --ref_fasta $reference_dir/hg38.genome.fa \\
-       --out_prefix $data_dir/$experiment.gc \\
-       --center_summit \\
-       --flank_size 1057 \\
-       --store_seq" | tee -a $logfile 
+       --out_prefix $data_dir/$experiment.gc.bed \\
+       --flank_size 1057" | tee -a $logfile 
 
 python get_gc_content.py \
        --input_bed $data_dir/${1}_inliers.bed \
        --ref_fasta $reference_dir/hg38.genome.fa \
-       --out_prefix $data_dir/$experiment.gc \
-       --center_summit \
-       --flank_size 1057 \
-       --store_seq
+       --out_prefix $data_dir/$experiment.gc.bed \
+       --flank_size 1057
 
-echo $( timestamp ): "bedtools intersect -v -a" $reference_dir/gc_hg38_nosmooth.tsv \
-"-b" $data_dir/${1}_inliers.bed > $data_dir/${experiment}.tsv  | tee -a $logfile 
+echo $( timestamp ): "
+bedtools intersect -v -a \\
+    $reference_dir/genomewide_gc_hg38_stride_50_flank_size_1057.bed \\
+    -b $data_dir/${1}_inliers.bed > $data_dir/${experiment}.tsv" | \
+    tee -a $logfile 
 
-bedtools intersect -v -a $reference_dir/gc_hg38_nosmooth.tsv \
+bedtools intersect -v -a \
+$reference_dir/genomewide_gc_hg38_stride_50_flank_size_1057.bed \
 -b $data_dir/${1}_inliers.bed > $data_dir/${experiment}.tsv
 
 echo $( timestamp ): "
-python get_chrom_gc_region_dict.py \\
-    --input_bed $data_dir/${experiment}.tsv \\
-    --outf $data_dir/${experiment}.gc.p" | tee -a $logfile 
+python get_gc_matched_negatives.py \\
+        --candidate_negatives $data_dir/${experiment}.tsv \\
+        --foreground_gc_bed  $data_dir/$experiment.gc.bed \\
+        --out_prefix $data_dir/${experiment}_negatives.bed" | tee -a $logfile 
 
-python get_chrom_gc_region_dict.py \
-    --input_bed $data_dir/$experiment.tsv \
-    --outf $data_dir/${experiment}.gc.p
-
-echo $( timestamp ): "
-python create_negatives_bed.py \\
-    --out-bed $data_dir/${experiment}_negatives.bed \\
-    --neg-pickle $data_dir/$experiment.gc.p \\
-    --ref-fasta $reference_dir/hg38.genome.fa \\
-    --peaks $data_dir/${experiment}.gc" | tee -a $logfile 
-
-python create_negatives_bed.py \
-    --out-bed $data_dir/${experiment}_negatives.bed \
-    --neg-pickle $data_dir/${experiment}.gc.p \
-    --ref-fasta $reference_dir/hg38.genome.fa \
-    --peaks $data_dir/${experiment}.gc
+python get_gc_matched_negatives.py \
+        --candidate_negatives $data_dir/${experiment}.tsv \
+        --foreground_gc_bed  $data_dir/$experiment.gc.bed \
+        --out_prefix $data_dir/${experiment}_negatives.bed
 
 # select negatives based on specified ratio
 

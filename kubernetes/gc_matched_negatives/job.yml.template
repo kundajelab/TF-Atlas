@@ -11,11 +11,11 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: 10Gi
-            cpu: 3
+            memory: 45G
+            cpu: 10
           limits:
-            memory: 12Gi
-            cpu: 3
+            memory: 50G
+            cpu: 12
         command:
         - /bin/bash
         - -c
@@ -23,5 +23,5 @@ spec:
         - bash gc_negatives.sh <> tfatlas/[] /tfatlas/TF-Atlas/kubernetes/gc_matched_negatives ^^
       restartPolicy: Never
       nodeSelector:
-        cloud.google.com/gke-nodepool: preprocessing
+        cloud.google.com/gke-nodepool: preprocessing-high
   backoffLimit: 0
