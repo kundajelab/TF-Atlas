@@ -71,8 +71,9 @@ outliers \
     --chrom-sizes $reference_dir/chrom.sizes \
     --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt) \
     --sequence-len 1000 \
-    --output-bed ${experiment}_inliers.bed
-    
+    --blacklist blacklist.bed \
+    --output-bed ${experiment}_inliers.bed 
+
 # copy inliers bed file to gcp
 echo $( timestamp ): "gsutil cp" ${experiment}_inliers.bed  gs://$2/data/$1/ | \
 tee -a $logfile
