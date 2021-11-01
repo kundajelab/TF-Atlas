@@ -33,14 +33,14 @@ echo $( timestamp ): "gsutil cp" gs://$2/data/$1/${1}_inliers.bed $data_dir | \
 tee -a $logfile
 gsutil cp gs://$2/data/$1/$1_inliers.bed  $data_dir
 
-# echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/* \
-# $reference_dir/ | tee -a $logfile
-# gsutil -m cp gs://$gcp_bucket/reference/* $reference_dir/
+echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/* \
+$reference_dir/ | tee -a $logfile
+gsutil -m cp gs://$gcp_bucket/reference/* $reference_dir/
 
-# # create index for the fasta file
-# echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
-# tee -a $logfile
-# samtools faidx $reference_dir/hg38.genome.fa
+# create index for the fasta file
+echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
+tee -a $logfile
+samtools faidx $reference_dir/hg38.genome.fa
 
 echo $( timestamp ): "
 python get_gc_content.py \\
