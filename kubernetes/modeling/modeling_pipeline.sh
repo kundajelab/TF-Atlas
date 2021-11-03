@@ -39,10 +39,10 @@ predictions_dir=$project_dir/predictions_and_metrics
 echo $( timestamp ): "mkdir" $predictions_dir | tee -a $logfile
 mkdir $predictions_dir
 
-# # copy down data and reference
-# echo $( timestamp ): "gsutil cp" gs://$2/data/$1/*.bigWig $data_dir | \
-# tee -a $logfile
-# gsutil cp gs://$2/data/$1/*.bigWig $data_dir
+# copy down data and reference
+echo $( timestamp ): "gsutil cp" gs://$2/data/$1/*.bigWig $data_dir | \
+tee -a $logfile
+gsutil cp gs://$2/data/$1/*.bigWig $data_dir
 
 # peaks only bed file
 echo $( timestamp ): "gsutil cp" gs://$2/data/$1/${1}_inliers.bed $data_dir | \
