@@ -61,6 +61,8 @@ outliers \\
     --chrom-sizes $reference_dir/chrom.sizes \\
     --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt) \\
     --sequence-len 1000 \\
+    --blacklist blacklist.bed \\
+    --global-sample-weight 1.0 \\
     --output-bed ${experiment}_inliers.bed" | tee -a $logfile 
     
 outliers \
@@ -72,6 +74,7 @@ outliers \
     --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt) \
     --sequence-len 1000 \
     --blacklist blacklist.bed \
+    --global-sample-weight 1.0 \
     --output-bed ${experiment}_inliers.bed 
 
 # copy inliers bed file to gcp
