@@ -20,7 +20,7 @@ spec:
         - /bin/bash
         - -c
         args:
-        - bash modeling_pipeline.sh <> tfatlas /tfatlas/TF-Atlas/kubernetes/modeling
+        - bash modeling_pipeline.sh <> tfatlas/[] /tfatlas/TF-Atlas/kubernetes/modeling || ^^ $$
       restartPolicy: Never
       nodeSelector:
         cloud.google.com/gke-nodepool: pool-1

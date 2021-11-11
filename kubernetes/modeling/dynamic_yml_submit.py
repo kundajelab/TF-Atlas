@@ -3,6 +3,10 @@ import sys
 
 template_path = sys.argv[1]
 experiments = sys.argv[2]
+encode_version = sys.argv[3]
+bpnet_params = sys.argv[4]
+peaks_file_suffix = sys.argv[5]
+model_tag = sys.argv[6]
 
 # read contents of template file as string
 with open(template_path, 'r') as f:
@@ -12,6 +16,10 @@ with open(template_path, 'r') as f:
 for experiment in experiments.split():
     yml_str = template_str.replace('{}', experiment.lower())
     yml_str = yml_str.replace('<>', experiment)
+    yml_str = yml_str.replace('[]', encode_version)
+    yml_str = yml_str.replace('||', bpnet_params)
+    yml_str = yml_str.replace('^^', peaks_file_suffix)
+    yml_str = yml_str.replace('$$', model_tag)
     
     # write to new yaml file
     yaml_fname = 'job_{}.yml'.format(experiment)

@@ -50,9 +50,9 @@ tee -a $logfile
 gsutil cp gs://$2/data/$1/${1}_inliers.bed $data_dir
 
 # user specified peaks+non peaks
-echo $( timestamp ): "gsutil cp" gs://$2/data/$1/${1}_combined_${peaks_file_suffix}.bed $data_dir | \
+echo $( timestamp ): "gsutil cp" gs://$2/data/$1/${1}_${peaks_file_suffix}.bed $data_dir | \
 tee -a $logfile
-gsutil cp gs://$2/data/$1/${1}_combined_${peaks_file_suffix}.bed $data_dir
+gsutil cp gs://$2/data/$1/${1}_${peaks_file_suffix}.bed $data_dir
 
 echo $( timestamp ): "gsutil cp" gs://$2/reference/* $reference_dir | \
 tee -a $logfile
@@ -63,7 +63,6 @@ echo $( timestamp ): "samtools faidx" $reference_dir/hg38.genome.fa | tee -a $lo
 samtools faidx $reference_dir/hg38.genome.fa
 
 # download input json template
-
 echo $( timestamp ): "gsutil cp" gs://$2/input_json/input.json \
 $project_dir/ | tee -a $logfile 
 gsutil cp gs://$2/input_json/input.json $project_dir/
@@ -79,9 +78,9 @@ sed -e "s/.bed/_inliers.bed/g" $project_dir/input.json > \
 $project_dir/input_peaks.json
 
 # modify the input json for the user specified bed file
-echo  $( timestamp ): "sed -e \"s/.bed/_combined_${peaks_file_suffix}.bed/g\"" \
+echo  $( timestamp ): "sed -e \"s/.bed/_${peaks_file_suffix}.bed/g\"" \
 $project_dir/input.json ">" $project_dir/input_peaks_nonpeaks.json | tee -a $logfile 
-sed -e "s/.bed/_combined_${peaks_file_suffix}.bed/g" $project_dir/input.json > \
+sed -e "s/.bed/_${peaks_file_suffix}.bed/g" $project_dir/input.json > \
 $project_dir/input_peaks_nonpeaks.json
 
 # download bpnet params json template
@@ -161,6 +160,7 @@ fastpredict \\
     --output-len 1000 \\
     --output-window-size 1000 \\
     --batch-size 64 \\
+    --generate-predicted-profile-bigWigs \\
     --threads 2" | tee -a $logfile 
 
 fastpredict \
@@ -175,6 +175,7 @@ fastpredict \
     --output-len 1000 \
     --output-window-size 1000 \
     --batch-size 64 \
+    --generate-predicted-profile-bigWigs \
     --threads 2
 
 # create the predictions directory
@@ -194,6 +195,7 @@ fastpredict \\
     --output-len 1000 \\
     --output-window-size 1000 \\
     --batch-size 64 \\
+    --generate-predicted-profile-bigWigs \\
     --threads 2" | tee -a $logfile 
 
 fastpredict \
@@ -208,6 +210,7 @@ fastpredict \
     --output-len 1000 \
     --output-window-size 1000 \
     --batch-size 64 \
+    --generate-predicted-profile-bigWigs \
     --threads 2
 
 # create the predictions directory
@@ -227,6 +230,7 @@ fastpredict \\
     --output-len 1000 \\
     --output-window-size 1000 \\
     --batch-size 64 \\
+    --generate-predicted-profile-bigWigs \\
     --threads 2" | tee -a $logfile 
 
 fastpredict \
@@ -241,6 +245,7 @@ fastpredict \
     --output-len 1000 \
     --output-window-size 1000 \
     --batch-size 64 \
+    --generate-predicted-profile-bigWigs \
     --threads 2
 
 # create the predictions directory
@@ -260,6 +265,7 @@ fastpredict \\
     --output-len 1000 \\
     --output-window-size 1000 \\
     --batch-size 64 \\
+    --generate-predicted-profile-bigWigs \\
     --threads 2" | tee -a $logfile 
 
 fastpredict \
@@ -274,6 +280,7 @@ fastpredict \
     --output-len 1000 \
     --output-window-size 1000 \
     --batch-size 64 \
+    --generate-predicted-profile-bigWigs \
     --threads 2
 
 # copy the result to gcp bucket
