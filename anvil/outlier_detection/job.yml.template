@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tfatlas-outliers-{}
+spec:
+  template:
+    spec:
+      containers:
+      - name: tfatlas-outliers-outliers-{}
+        image: kundajelab/tf-atlas:gcp-outliers
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 45Gi
+            cpu: 12
+          limits:
+            memory: 50Gi
+            cpu: 14
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - bash outliers.sh <> tfatlas/[] /tfatlas/TF-Atlas/kubernetes/outlier_detection
+      restartPolicy: Never
+      nodeSelector:
+        cloud.google.com/gke-nodepool: preprocessing-high
+  backoffLimit: 0

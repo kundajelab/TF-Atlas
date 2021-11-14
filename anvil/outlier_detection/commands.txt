@@ -1,0 +1,7 @@
+gcloud container clusters get-credentials tfatlas --zone us-central1-c
+kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded.yaml
+
+
+docker build --no-cache /users/zahoor/TF-Atlas/TF-Atlas/kubernetes/outlier_detection -t kundajelab/tf-atlas:gcp-outliers
+docker push kundajelab/tf-atlas:gcp-outliers
+
