@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tfatlas-gc-matched-negatives-{}
+spec:
+  template:
+    spec:
+      containers:
+      - name: tfatlas-gc-matched--negatives-{}
+        image: kundajelab/tf-atlas:gcp-gc-matched-negatives
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 45G
+            cpu: 10
+          limits:
+            memory: 50G
+            cpu: 12
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - bash gc_negatives.sh <> tfatlas/[] /tfatlas/TF-Atlas/kubernetes/gc_matched_negatives ^^
+      restartPolicy: Never
+      nodeSelector:
+        cloud.google.com/gke-nodepool: preprocessing-high
+  backoffLimit: 0

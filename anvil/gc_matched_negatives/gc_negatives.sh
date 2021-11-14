@@ -10,16 +10,9 @@ function timestamp {
 
 
 experiment=$1
-reference_file=$2
-reference_file_index=$3
-chrom_sizes=$4
-chroms_txt=$5
-reference_gc_hg38_stride_50_flank_size_1057=$6
-peaks=$7
-ratio=$8
-
-mkdir /project
-project_dir=/project
+gcp_bucket=$2
+project_dir=$3
+ratio=$4
 
 # create the log file
 logfile=$project_dir/${1}_gc_matched_negatives.log
@@ -36,43 +29,18 @@ echo $( timestamp ): "mkdir" $reference_dir | tee -a $logfile
 mkdir $reference_dir
 
 # copy down inliers bed file and reference files
+echo $( timestamp ): "gsutil cp" gs://$2/data/$1/${1}_inliers.bed $data_dir | \
+tee -a $logfile
+gsutil cp gs://$2/data/$1/$1_inliers.bed  $data_dir
 
+echo $( timestamp ): "gsutil -m cp" gs://$gcp_bucket/reference/* \
+$reference_dir/ | tee -a $logfile
+gsutil -m cp gs://$gcp_bucket/reference/* $reference_dir/
 
-echo $( timestamp ): "cp" $peaks ${data_dir}/${1}_inliers.bed.gz |\
-tee -a $logfile 
-
-cp $peaks ${data_dir}/${1}_inliers.bed.gz
-
-echo $( timestamp ): "gunzip" ${data_dir}/${1}_inliers.bed.gz |\
-tee -a $logfile 
-
-gunzip ${data_dir}/${1}_inliers.bed.gz
-
-
-# copy down data and reference
-echo $( timestamp ): "cp" $reference_file ${reference_dir}/hg38.genome.fa | \
-tee -a $logfile 
-
-echo $( timestamp ): "cp" $reference_file_index ${reference_dir}/hg38.genome.fa.fai |\
-tee -a $logfile 
-
-echo $( timestamp ): "cp" $chrom_sizes ${reference_dir}/chrom.sizes |\
-tee -a $logfile 
-
-echo $( timestamp ): "cp" $chroms_txt ${reference_dir}/hg38_chroms.txt |\
-tee -a $logfile 
-
-echo $( timestamp ): "cp" $reference_gc_hg38_stride_50_flank_size_1057 ${reference_dir}/genomewide_gc_hg38_stride_50_flank_size_1057.bed |\
-tee -a $logfile 
-
-# copy down data and reference
-
-cp $reference_file ${reference_dir}/hg38.genome.fa
-cp $reference_file_index ${reference_dir}/hg38.genome.fa.fai
-cp $chrom_sizes $reference_dir/chrom.sizes
-cp $chroms_txt $reference_dir/hg38_chroms.txt
-cp $reference_gc_hg38_nosmooth ${reference_dir}/gc_hg38_nosmooth.tsv
-
+# create index for the fasta file
+echo $( timestamp ): "samtools faidx" $reference_dir/genome.fa | \
+tee -a $logfile
+samtools faidx $reference_dir/hg38.genome.fa
 
 echo $( timestamp ): "
 python get_gc_content.py \\
@@ -127,8 +95,16 @@ shuf -n $num_select $data_dir/${experiment}_negatives.bed > \
 # combine the gc matched negatives and the original peaks file into 
 # a single file
 echo $( timestamp ): "cat" $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives_select.bed ">" \
-    $data_dir/peaks_gc_neg_combined.bed  | tee -a $logfile 
+    $data_dir/${experiment}_combined_1_${ratio}.bed  | tee -a $logfile 
 
 cat $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives_select.bed > \
-    $data_dir/peaks_gc_neg_combined.bed
+    $data_dir/${experiment}_combined_1_${ratio}.bed
 
+# copy combined bed file to gcp
+echo $( timestamp ): "gsutil cp" $data_dir/${experiment}_combined_1_${ratio}.bed  gs://$2/data/$1/ | \
+tee -a $logfile
+gsutil cp $data_dir/${experiment}_combined_1_${ratio}.bed  gs://$2/data/$1/
+
+# copy log file to gcp
+echo $( timestamp ): "gsutil cp" $logfile gs://$2/logs/ | tee -a $logfile 
+gsutil cp $logfile gs://$2/logs/
