@@ -83,7 +83,7 @@ outliers \\
     --sequence-len 1000 \\
     --blacklist blacklist.bed \\
     --global-sample-weight 1.0 \\
-    --output-bed ${experiment}_inliers.bed" | tee -a $logfile 
+    --output-bed $project_dir/$peaks_inliers.bed" | tee -a $logfile 
     
 outliers \
     --input-data $project_dir/input_outliers.json  \
@@ -95,4 +95,4 @@ outliers \
     --sequence-len 1000 \
     --blacklist blacklist.bed \
     --global-sample-weight 1.0 \
-    --output-bed ${experiment}_inliers.bed 
+    --output-bed $project_dir/$peaks_inliers.bed 
