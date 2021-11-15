@@ -66,7 +66,7 @@ task run_modelling {
 		memory: 30 + "GB"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
-		gpuType: "nvidia-tesla-p100"
+		gpuType: "nvidia-tesla-k80"
 		gpuCount: 1
 		nvidiaDriverVersion: "418.87.00" 
 	}
