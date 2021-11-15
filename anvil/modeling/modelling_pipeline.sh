@@ -117,9 +117,6 @@ tee -a $logfile
 gunzip ${data_dir}/${experiment}_peaks_only.bed.gz
 
 
-echo number of peaks in $peaks $(zcat ${data_dir}/${experiment}_combined.bed | wc -l)
-
-echo number of peaks in $peaks_for_testing $(zcat ${data_dir}/${experiment}_peaks_only.bed | wc -l)
 
 
 
@@ -175,6 +172,9 @@ $project_dir/splits.json | tee -a $logfile
 cp $splits_json $project_dir/splits.json
 
 
+
+ls /project/data/
+cat $project_dir/input.json
 
 # compute the counts loss weight to be used for this experiment
 echo $( timestamp ): "counts_loss_weight=\`counts_loss_weight --input-data \
