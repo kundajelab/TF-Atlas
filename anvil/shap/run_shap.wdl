@@ -22,6 +22,8 @@ task run_shap {
 		chmod -R 777 TF-Atlas
 		cd TF-Atlas/anvil/shap/
 
+		nvcc --version
+
 		##shap
 
 		echo "run /my_scripts/TF-Atlas/anvil/shap/shap_pipeline.sh" ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
