@@ -39,7 +39,7 @@ task run_shap {
 	}
 
 	runtime {
-		docker: 'vivekramalingam/tf-atlas:gcp-shap'
+		docker: 'kundajelab/tf-atlas:gcp-shap'
 		memory: 30 + "GB"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
