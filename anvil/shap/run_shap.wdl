@@ -10,6 +10,7 @@ task run_shap {
 		File chroms_txt
 		Array [File] bigwigs
 		File peaks
+		Array [File] model
 
 
   	}	
@@ -23,8 +24,8 @@ task run_shap {
 
 		##shap
 
-		echo "run /my_scripts/TF-Atlas/anvil/shap/shap_pipeline.sh" ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks}
-		/my_scripts/TF-Atlas/anvil/shap/shap_pipeline.sh ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks}
+		echo "run /my_scripts/TF-Atlas/anvil/shap/shap_pipeline.sh" ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
+		/my_scripts/TF-Atlas/anvil/shap/shap_pipeline.sh ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
 
 		echo "copying all files to cromwell_root folder"
 		
@@ -59,6 +60,7 @@ workflow shap {
 		File chroms_txt
 		Array [File] bigwigs
 		File peaks
+		Array [File] model
 
 	}
 
@@ -71,7 +73,8 @@ workflow shap {
 			chrom_sizes = chrom_sizes,
 			chroms_txt = chroms_txt,
 			bigwigs = bigwigs,
-			peaks = peaks
+			peaks = peaks,
+			model = model
  	}
 	output {
 		Array[File] shap = run_shap.shap

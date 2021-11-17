@@ -16,6 +16,7 @@ chrom_sizes=$5
 chroms_txt=$6
 bigwigs=$7
 peaks=$8
+model=$9
 
 mkdir /project
 project_dir=/project
@@ -34,6 +35,11 @@ mkdir $data_dir
 reference_dir=$project_dir/reference
 echo $( timestamp ): "mkdir" $reference_dir | tee -a $logfile
 mkdir $reference_dir
+
+# create the model directory
+model_dir=$project_dir/model
+echo $( timestamp ): "mkdir" $model_dir | tee -a $logfile
+mkdir $model_dir
 
 # create the shap directory
 shap_dir=$project_dir/shap
@@ -57,6 +63,7 @@ echo $( timestamp ): "cp" $chroms_txt ${reference_dir}/hg38_chroms.txt |\
 tee -a $logfile 
 
 
+
 # copy down data and reference
 
 cp $reference_file $reference_dir/hg38.genome.fa
@@ -65,12 +72,18 @@ cp $chrom_sizes $reference_dir/chrom.sizes
 cp $chroms_txt $reference_dir/hg38_chroms.txt
 
 
-# Step 1: Copy the bigwig and peak files
-
-echo $bigwigs | sed 's/,/ /g' | xargs cp -t $data_dir/
+# Step 1: Copy the bigwigs, model and peak files
 
 echo $( timestamp ): "cp" $bigwigs ${data_dir}/ |\
 tee -a $logfile 
+
+echo $bigwigs | sed 's/,/ /g' | xargs cp -t $data_dir/
+
+
+echo $( timestamp ): "cp" $model ${model_dir}/ |\
+tee -a $logfile 
+
+echo $model | sed 's/,/ /g' | xargs cp -t $model_dir/
 
 
 echo $( timestamp ): "cp" $peaks ${data_dir}/${experiment}.bed.gz |\
