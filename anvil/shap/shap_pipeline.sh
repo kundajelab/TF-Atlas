@@ -96,6 +96,8 @@ tee -a $logfile
 
 gunzip ${data_dir}/${experiment}.bed.gz
 
+ls ${data_dir}
+
 
 # download input json template
 # the input json 
