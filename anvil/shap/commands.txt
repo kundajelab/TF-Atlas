@@ -1,0 +1,4 @@
+gcloud container clusters get-credentials tfatlas --zone us-central1-c
+kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded.yaml
+docker build --no-cache /users/zahoor/TF-Atlas/TF-Atlas/kubernetes/shap -t kundajelab/tf-atlas:gcp-shap
+docker push kundajelab/tf-atlas:gcp-shap

@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tfatlas-modeling-{}
+spec:
+  template:
+    spec:
+      containers:
+      - name: tfatlas-modeling-gpu-{}
+        image: kundajelab/tf-atlas:gcp-shap
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: 25Gi
+            cpu: 7
+          limits:
+            memory: 30Gi
+            cpu: 7
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - bash shap_pipeline.sh <> tfatlas /tfatlas/TF-Atlas/kubernetes/shap
+      restartPolicy: Never
+      nodeSelector:
+        cloud.google.com/gke-nodepool: pool-1
+  backoffLimit: 0
