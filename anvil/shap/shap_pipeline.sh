@@ -89,7 +89,7 @@ echo $model | sed 's/,/ /g' | xargs cp -t $model_dir/
 echo $( timestamp ): "cp" $peaks ${data_dir}/${experiment}.bed.gz |\
 tee -a $logfile 
 
-cp $peaks ${data_dir}/${experiment}_combined.bed.gz
+cp $peaks ${data_dir}/${experiment}.bed.gz
 
 echo $( timestamp ): "gunzip" ${data_dir}/${experiment}.bed.gz |\
 tee -a $logfile 
