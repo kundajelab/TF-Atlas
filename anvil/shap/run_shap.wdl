@@ -48,7 +48,7 @@ task run_shap {
 		disks: "local-disk 250 HDD"
 		gpuType: "nvidia-tesla-p100"
 		gpuCount: 1
-		nvidiaDriverVersion: "418.87.00" 
+		nvidiaDriverVersion: "450.36.06" 
 	}
 }
 
