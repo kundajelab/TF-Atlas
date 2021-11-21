@@ -22,12 +22,14 @@ task run_modisco {
 
 		echo "copying all files to cromwell_root folder"
 		
-		cp -r /project/modisco /cromwell_root/
+		cp -r /project/modisco_profile /cromwell_root/
+		cp -r /project/modisco_counts /cromwell_root/
 		
 	}
 	
 	output {
-		Array[File] modisco = glob("modisco/*")
+		Array[File] modisco_profile = glob("modisco_profile/*")
+		Array[File] modisco_counts = glob("modisco_counts/*")
 		
 	
 	
@@ -57,7 +59,8 @@ workflow modisco {
 			shap = shap
  	}
 	output {
-		Array[File] modisco = run_modisco.modisco
+		Array[File] modisco_profile = run_modisco.modisco_profile
+		Array[File] modisco_counts = run_modisco.modisco_counts
 
 		
 	}
