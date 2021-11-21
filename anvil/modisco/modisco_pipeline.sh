@@ -40,7 +40,7 @@ modisco_counts_dir=$project_dir/modisco_counts
 echo $( timestamp ): "mkdir" $modisco_counts_dir | tee -a $logfile
 mkdir $modisco_counts_dir
 
-Step 1: Copy the shap files
+#Step 1: Copy the shap files
 
 echo $( timestamp ): "cp" $shap ${shap_dir}/ |\
 tee -a $logfile 
@@ -48,7 +48,7 @@ tee -a $logfile
 echo $shap | sed 's/,/ /g' | xargs cp -t $shap_dir/
 
 
-Step 2: Run modisco on counts and profile
+#Step 2: Run modisco on counts and profile
 
 echo $( timestamp ): "
 motif_discovery \\
