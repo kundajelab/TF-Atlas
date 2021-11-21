@@ -35,12 +35,9 @@ task run_modisco {
 
 	runtime {
 		docker: 'vivekramalingam/tf-atlas:gcp-modeling'
-		memory: 30 + "GB"
+		memory: 50 + "GB"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
-		gpuType: "nvidia-tesla-p100"
-		gpuCount: 1
-		nvidiaDriverVersion: "450.51.05" 
 		preemptible: 1
   		maxRetries: 3
 	}
