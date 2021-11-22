@@ -31,8 +31,6 @@ task run_fastpredict {
 
 		echo "copying all files to cromwell_root folder"
 		
-		cp /project/bpnet_params.json /cromwell_root/bpnet_params.json
-		cp -r /project/model /cromwell_root/
 		cp -r /project/predictions_and_metrics_test_peaks_test_chroms /cromwell_root/
 		cp -r /project/predictions_and_metrics_test_peaks_all_chroms /cromwell_root/
 		cp -r /project/predictions_and_metrics_all_peaks_test_chroms /cromwell_root/
@@ -46,8 +44,6 @@ task run_fastpredict {
 	}
 	
 	output {
-		File bpnet_params_updated_json = "bpnet_params.json"
-		Array[File] model = glob("model/*")
 		Array[File] predictions_and_metrics_test_peaks_test_chroms = glob("predictions_and_metrics_test_peaks_test_chroms/*")
 		Array[File] predictions_and_metrics_test_peaks_all_chroms = glob("predictions_and_metrics_test_peaks_all_chroms/*")
 		Array[File] predictions_and_metrics_all_peaks_all_chroms = glob("predictions_and_metrics_all_peaks_all_chroms/*")
