@@ -62,7 +62,7 @@ echo $( timestamp ): "mkdir" $predictions_dir_test_peaks_test_chroms | tee -a $l
 mkdir $predictions_dir_test_peaks_test_chroms
 
 # create the predictions directory with test_peaks and all_chroms
-predictions_dir_test_peaks_test_chroms=$project_dir/predictions_and_metrics_test_peaks_all_chroms
+predictions_dir_test_peaks_all_chroms=$project_dir/predictions_and_metrics_test_peaks_all_chroms
 echo $( timestamp ): "mkdir" $predictions_dir_test_peaks_all_chroms | tee -a $logfile
 mkdir $predictions_dir_test_peaks_all_chroms
 
