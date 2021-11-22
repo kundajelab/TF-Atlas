@@ -10,25 +10,22 @@ function timestamp {
 
 experiment=$1
 input_json=$2
-training_input_json=$3
+model=$3
 testing_input_json=$4
-bpnet_params_json=$5
-splits_json=$6
-reference_file=$7
-reference_file_index=$8
-chrom_sizes=$9
-chroms_txt=${10}
-bigwigs=${11}
-peaks=${12}
-peaks_for_testing=${13}
-learning_rate=${14}
+reference_file=$5
+reference_file_index=$6
+chrom_sizes=$7
+chroms_txt=${8}
+bigwigs=${9}
+peaks=${10}
+peaks_for_testing=${11}
 
 
 mkdir /project
 project_dir=/project
 
 # create the log file
-logfile=$project_dir/${1}_modeling.log
+logfile=$project_dir/${1}_fastpredict.log
 touch $logfile
 
 # create the data directory
@@ -89,13 +86,18 @@ cp $chrom_sizes $reference_dir/chrom.sizes
 cp $chroms_txt $reference_dir/hg38_chroms.txt
 
 
-# Step 1: Copy the bigwig and peak files
+# Step 1: Copy the bigwig,models and peak files
 
 echo $bigwigs | sed 's/,/ /g' | xargs cp -t $data_dir/
 
 echo $( timestamp ): "cp" $bigwigs ${data_dir}/ |\
 tee -a $logfile 
 
+
+echo $model | sed 's/,/ /g' | xargs cp -t $model_dir/
+
+echo $( timestamp ): "cp" $model ${model_dir}/ |\
+tee -a $logfile 
 
 
 echo $( timestamp ): "cp" $peaks ${data_dir}/${experiment}_combined.bed.gz |\
@@ -107,7 +109,6 @@ echo $( timestamp ): "gunzip" ${data_dir}/${experiment}_combined.bed.gz |\
 tee -a $logfile 
 
 gunzip ${data_dir}/${experiment}_combined.bed.gz
-
 
 
 
@@ -124,76 +125,27 @@ gunzip ${data_dir}/${experiment}_peaks_only.bed.gz
 
 
 
-
-
-# cp input json template
-
-# First the input json for the train command (with loci from 
-# the combined bed file, peaks + gc-matched negatives)
-
-echo $( timestamp ): "cp" $training_input_json \
-$project_dir/training_input.json | tee -a $logfile 
-cp $training_input_json $project_dir/training_input.json
-
-# modify the input json 
-echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/training_input.json 
-sed -i -e "s/<>/$1/g" $project_dir/training_input.json | tee -a $logfile 
-
-
-# Finally, the input json for the rest of the commands 
+# cp the input json for the rest of the commands 
 
 echo $( timestamp ): "cp" $input_json \
 $project_dir/input.json | tee -a $logfile 
 cp $input_json $project_dir/input.json
 
-
-
-# modify the input json for 
+# modify the input json
 echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/input.json 
 sed -i -e "s/<>/$1/g" $project_dir/input.json | tee -a $logfile 
+
 
 
 echo $( timestamp ): "cp" $testing_input_json \
 $project_dir/testing_input.json | tee -a $logfile 
 cp $testing_input_json $project_dir/testing_input.json
 
-
-
-# modify the testing_input json for 
+# modify the testing_input json
 echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/testing_input.json 
 sed -i -e "s/<>/$1/g" $project_dir/testing_input.json | tee -a $logfile 
 
 
-
-# cp bpnet params json template
-echo $( timestamp ): "cp" $bpnet_params_json \
-$project_dir/bpnet_params.json| tee -a $logfile 
-cp $bpnet_params_json $project_dir/bpnet_params.json
-
-
-
-# cp splits json template
-echo $( timestamp ): "cp" $splits_json \
-$project_dir/splits.json | tee -a $logfile 
-cp $splits_json $project_dir/splits.json
-
-
-
-ls /project/data/
-cat $project_dir/input.json
-
-# compute the counts loss weight to be used for this experiment
-echo $( timestamp ): "counts_loss_weight=\`counts_loss_weight --input-data \
-$project_dir/input.json\`" | tee -a $logfile
-counts_loss_weight=`counts_loss_weight --input-data $project_dir/input.json`
-
-# print the counts loss weight
-echo $( timestamp ): "counts_loss_weight:" $counts_loss_weight | tee -a $logfile 
-
-# modify the bpnet params json to reflect the counts loss weight
-echo  $( timestamp ): "sed -i -e" "s/<>/$counts_loss_weight/g" \
-$project_dir/bpnet_params.json | tee -a $logfile 
-sed -i -e "s/<>/$counts_loss_weight/g" $project_dir/bpnet_params.json
 
 #set threads based on number of peaks
 
@@ -203,45 +155,6 @@ else
     threads=2
 fi
 
-
-echo $( timestamp ): "
-train \\
-    --input-data $project_dir/training_input.json \\
-    --output-dir $model_dir \\
-    --reference-genome $reference_dir/hg38.genome.fa \\
-    --chrom-sizes $reference_dir/chrom.sizes \\
-    --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt)  \\
-    --shuffle \\
-    --epochs 100 \\
-    --splits $project_dir/splits.json \\
-    --model-arch-name BPNet \\
-    --model-arch-params-json $project_dir/bpnet_params.json \\
-    --sequence-generator-name BPNet \\
-    --model-output-filename $1 \\
-    --input-seq-len 2114 \\
-    --output-len 1000 \\
-    --threads $threads \\
-    --reverse-complement-augmentation \\
-    --learning-rate $learning_rate" | tee -a $logfile 
-
-train \
-    --input-data $project_dir/training_input.json \
-    --output-dir $model_dir \
-    --reference-genome $reference_dir/hg38.genome.fa \
-    --chrom-sizes $reference_dir/chrom.sizes \
-    --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt)  \
-    --shuffle \
-    --epochs 100 \
-    --splits $project_dir/splits.json \
-    --model-arch-name BPNet \
-    --model-arch-params-json $project_dir/bpnet_params.json \
-    --sequence-generator-name BPNet \
-    --model-output-filename $1 \
-    --input-seq-len 2114 \
-    --output-len 1000 \
-    --threads $threads \
-    --reverse-complement-augmentation \
-    --learning-rate $learning_rate
 
 #get the test chromosome
 
