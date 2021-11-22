@@ -6,6 +6,7 @@ task run_fastpredict {
 		Array [File] model
 		File input_json
 		File testing_input_json
+		File splits_json
 		File reference_file
 		File reference_file_index
 		File chrom_sizes
@@ -23,12 +24,12 @@ task run_fastpredict {
 		git clone https://github.com/kundajelab/TF-Atlas.git
 		chmod -R 777 TF-Atlas
 		cd TF-Atlas/anvil/modeling/
-		
+
 
 		##fastpredict
 
-		echo "run /my_scripts/TF-Atlas/anvil/modeling/fastpredict_pipeline.sh" ${experiment} ${sep=',' model} ${input_json} ${testing_input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${peaks_for_testing}
-		/my_scripts/TF-Atlas/anvil/modeling/fastpredict_pipeline.sh ${experiment} ${sep=',' model} ${input_json} ${testing_input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${peaks_for_testing}
+		echo "run /my_scripts/TF-Atlas/anvil/modeling/fastpredict_pipeline.sh" ${experiment} ${sep=',' model} ${input_json} ${testing_input_json} ${splits_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${peaks_for_testing}
+		/my_scripts/TF-Atlas/anvil/modeling/fastpredict_pipeline.sh ${experiment} ${sep=',' model} ${input_json} ${testing_input_json} ${splits_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${peaks_for_testing}
 
 		echo "copying all files to cromwell_root folder"
 		
@@ -76,6 +77,7 @@ workflow fastpredict {
 		Array [File] model
 		File input_json
 		File testing_input_json
+		File splits_json
 		File reference_file
 		File reference_file_index
 		File chrom_sizes
@@ -92,6 +94,7 @@ workflow fastpredict {
 			model = model,
 			input_json = input_json,
 			testing_input_json = testing_input_json,
+			splits_json = splits_json,
 			reference_file = reference_file,
 			reference_file_index = reference_file_index,	
 			chrom_sizes = chrom_sizes,

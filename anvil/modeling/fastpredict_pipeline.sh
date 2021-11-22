@@ -9,16 +9,17 @@ function timestamp {
 }
 
 experiment=$1
-input_json=$2
-model=$3
+model=$2
+input_json=$3
 testing_input_json=$4
-reference_file=$5
-reference_file_index=$6
-chrom_sizes=$7
-chroms_txt=${8}
-bigwigs=${9}
-peaks=${10}
-peaks_for_testing=${11}
+splits_json=$5
+reference_file=$6
+reference_file_index=$7
+chrom_sizes=$9
+chroms_txt=$9
+bigwigs=${10}
+peaks=${11}
+peaks_for_testing=${12}
 
 
 mkdir /project
@@ -145,6 +146,11 @@ cp $testing_input_json $project_dir/testing_input.json
 echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/testing_input.json 
 sed -i -e "s/<>/$1/g" $project_dir/testing_input.json | tee -a $logfile 
 
+
+# cp splits json template
+echo $( timestamp ): "cp" $splits_json \
+$project_dir/splits.json | tee -a $logfile 
+cp $splits_json $project_dir/splits.json
 
 
 #set threads based on number of peaks
