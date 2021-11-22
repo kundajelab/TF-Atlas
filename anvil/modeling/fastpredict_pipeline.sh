@@ -60,7 +60,7 @@ echo $( timestamp ): "mkdir" $predictions_dir_test_peaks_test_chroms | tee -a $l
 mkdir $predictions_dir_test_peaks_test_chroms
 
 # create the predictions directory with test_peaks and all_chroms
-predictions_dir_test_peaks_test_chroms=$project_dir/predictions_and_metrics_test_peaks_all_chroms
+predictions_dir_test_peaks_all_chroms=$project_dir/predictions_and_metrics_test_peaks_all_chroms
 echo $( timestamp ): "mkdir" $predictions_dir_test_peaks_all_chroms | tee -a $logfile
 mkdir $predictions_dir_test_peaks_all_chroms
 
@@ -124,6 +124,10 @@ tee -a $logfile
 
 gunzip ${data_dir}/${experiment}_peaks_only.bed.gz
 
+
+head ${data_dir}/${experiment}_combined.bed
+
+head ${data_dir}/${experiment}_peaks_only.bed
 
 
 # cp the input json for the rest of the commands 
