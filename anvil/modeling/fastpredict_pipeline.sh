@@ -65,6 +65,7 @@ echo $( timestamp ): "mkdir" $predictions_dir_test_peaks_all_chroms | tee -a $lo
 mkdir $predictions_dir_test_peaks_all_chroms
 
 
+ls $project_dir
 
 echo $( timestamp ): "cp" $reference_file ${reference_dir}/hg38.genome.fa | \
 tee -a $logfile 
@@ -159,6 +160,11 @@ $project_dir/splits.json | tee -a $logfile
 cp $splits_json $project_dir/splits.json
 
 
+cat $project_dir/input.json 
+cat $project_dir/testing_input.json
+cat $project_dir/splits.json
+
+
 #set threads based on number of peaks
 
 if [ $(wc -l < ${data_dir}/${experiment}_combined.bed) -lt 3500 ];then
@@ -188,7 +194,7 @@ fastpredict \\
     --output-window-size 1000 \\
     --batch-size 64 \\
     --generate-predicted-profile-bigWigs \\
-    --threads 2" | tee -a $logfile 
+    --threads $threads" | tee -a $logfile 
 
 fastpredict \
     --model $model_dir/${1}_split000.h5 \
@@ -203,7 +209,7 @@ fastpredict \
     --output-window-size 1000 \
     --batch-size 64 \
     --generate-predicted-profile-bigWigs \
-    --threads 2
+    --threads $threads
 
 
 
@@ -221,7 +227,7 @@ fastpredict \\
     --output-window-size 1000 \\
     --batch-size 64 \\
     --generate-predicted-profile-bigWigs \\
-    --threads 2" | tee -a $logfile 
+    --threads $threads" | tee -a $logfile 
 
 fastpredict \
     --model $model_dir/${1}_split000.h5 \
@@ -236,7 +242,7 @@ fastpredict \
     --output-window-size 1000 \
     --batch-size 64 \
     --generate-predicted-profile-bigWigs \
-    --threads 2
+    --threads $threads
 
 
 
@@ -255,7 +261,7 @@ fastpredict \\
     --output-window-size 1000 \\
     --batch-size 64 \\
     --generate-predicted-profile-bigWigs \\
-    --threads 2" | tee -a $logfile 
+    --threads $threads" | tee -a $logfile 
 
 fastpredict \
     --model $model_dir/${1}_split000.h5 \
@@ -270,7 +276,7 @@ fastpredict \
     --output-window-size 1000 \
     --batch-size 64 \
     --generate-predicted-profile-bigWigs \
-    --threads 2
+    --threads $threads
 
 
 echo $( timestamp ): "
@@ -287,7 +293,7 @@ fastpredict \\
     --output-window-size 1000 \\
     --batch-size 64 \\
     --generate-predicted-profile-bigWigs \\
-    --threads 2" | tee -a $logfile 
+    --threads $threads" | tee -a $logfile 
 
 fastpredict \
     --model $model_dir/${1}_split000.h5 \
@@ -302,7 +308,7 @@ fastpredict \
     --output-window-size 1000 \
     --batch-size 64 \
     --generate-predicted-profile-bigWigs \
-    --threads 2
+    --threads $threads
 
 # create necessary files to copy the predictions results to cromwell folder
 

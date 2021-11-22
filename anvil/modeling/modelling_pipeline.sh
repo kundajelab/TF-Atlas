@@ -263,7 +263,7 @@ fastpredict \\
     --output-window-size 1000 \\
     --batch-size 64 \\
     --generate-predicted-profile-bigWigs \\
-    --threads 2" | tee -a $logfile 
+    --threads $threads" | tee -a $logfile 
 
 fastpredict \
     --model $model_dir/${1}_split000.h5 \
@@ -278,7 +278,7 @@ fastpredict \
     --output-window-size 1000 \
     --batch-size 64 \
     --generate-predicted-profile-bigWigs \
-    --threads 2
+    --threads $threads
 
 
 
@@ -296,7 +296,7 @@ fastpredict \\
     --output-window-size 1000 \\
     --batch-size 64 \\
     --generate-predicted-profile-bigWigs \\
-    --threads 2" | tee -a $logfile 
+    --threads $threads" | tee -a $logfile 
 
 fastpredict \
     --model $model_dir/${1}_split000.h5 \
@@ -311,7 +311,7 @@ fastpredict \
     --output-window-size 1000 \
     --batch-size 64 \
     --generate-predicted-profile-bigWigs \
-    --threads 2
+    --threads $threads
 
 
 
@@ -330,7 +330,7 @@ fastpredict \\
     --output-window-size 1000 \\
     --batch-size 64 \\
     --generate-predicted-profile-bigWigs \\
-    --threads 2" | tee -a $logfile 
+    --threads $threads" | tee -a $logfile 
 
 fastpredict \
     --model $model_dir/${1}_split000.h5 \
@@ -345,7 +345,7 @@ fastpredict \
     --output-window-size 1000 \
     --batch-size 64 \
     --generate-predicted-profile-bigWigs \
-    --threads 2
+    --threads $threads
 
 
 echo $( timestamp ): "
@@ -362,7 +362,7 @@ fastpredict \\
     --output-window-size 1000 \\
     --batch-size 64 \\
     --generate-predicted-profile-bigWigs \\
-    --threads 2" | tee -a $logfile 
+    --threads $threads" | tee -a $logfile 
 
 fastpredict \
     --model $model_dir/${1}_split000.h5 \
@@ -377,7 +377,7 @@ fastpredict \
     --output-window-size 1000 \
     --batch-size 64 \
     --generate-predicted-profile-bigWigs \
-    --threads 2
+    --threads $threads
 
 # create necessary files to copy the predictions results to cromwell folder
 
