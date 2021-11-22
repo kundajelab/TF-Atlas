@@ -23,6 +23,7 @@ task run_fastpredict {
 		git clone https://github.com/kundajelab/TF-Atlas.git
 		chmod -R 777 TF-Atlas
 		cd TF-Atlas/anvil/modeling/
+		
 
 		##fastpredict
 
