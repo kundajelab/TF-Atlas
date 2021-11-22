@@ -125,6 +125,8 @@ tee -a $logfile
 gunzip ${data_dir}/${experiment}_peaks_only.bed.gz
 
 
+ls ${data_dir}
+
 head ${data_dir}/${experiment}_combined.bed
 
 head ${data_dir}/${experiment}_peaks_only.bed
