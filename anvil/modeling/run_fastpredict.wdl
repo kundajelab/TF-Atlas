@@ -100,13 +100,13 @@ workflow fastpredict {
 			peaks_for_testing = peaks_for_testing
  	}
 	output {
-		Array[File] predictions_and_metrics_all_peaks_test_chroms = run_modelling.predictions_and_metrics_all_peaks_test_chroms
-		Array[File] predictions_and_metrics_test_peaks_test_chroms = run_modelling.predictions_and_metrics_test_peaks_test_chroms
-		Array[File] predictions_and_metrics_all_peaks_all_chroms = run_modelling.predictions_and_metrics_all_peaks_all_chroms
-		Array[File] predictions_and_metrics_test_peaks_all_chroms = run_modelling.predictions_and_metrics_test_peaks_all_chroms
-		Float spearman = run_modelling.spearman
-		Float pearson = run_modelling.pearson
-		Float jsd = run_modelling.jsd
+		Array[File] predictions_and_metrics_all_peaks_test_chroms = run_fastpredict.predictions_and_metrics_all_peaks_test_chroms
+		Array[File] predictions_and_metrics_test_peaks_test_chroms = run_fastpredict.predictions_and_metrics_test_peaks_test_chroms
+		Array[File] predictions_and_metrics_all_peaks_all_chroms = run_fastpredict.predictions_and_metrics_all_peaks_all_chroms
+		Array[File] predictions_and_metrics_test_peaks_all_chroms = run_fastpredict.predictions_and_metrics_test_peaks_all_chroms
+		Float spearman = run_fastpredict.spearman
+		Float pearson = run_fastpredict.pearson
+		Float jsd = run_fastpredict.jsd
 		
 	}
 }
