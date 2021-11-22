@@ -1,6 +1,6 @@
 version 1.0
 
-task run_modelling {
+task run_fastpredict {
 	input {
 		String experiment
 		Array [File] model
@@ -73,7 +73,7 @@ task run_modelling {
 	}
 }
 
-workflow modelling {
+workflow fastpredict {
 	input {
 		String experiment
 		Array [File] model
@@ -89,7 +89,7 @@ workflow modelling {
 
 	}
 
-	call run_modelling {
+	call run_fastpredict {
 		input:
 			experiment = experiment,
 			model = model,
