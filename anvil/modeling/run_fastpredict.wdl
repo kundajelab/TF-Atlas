@@ -66,7 +66,6 @@ task run_fastpredict {
 		gpuType: "nvidia-tesla-k80"
 		gpuCount: 1
 		nvidiaDriverVersion: "418.87.00"
-		preemptible: 2
   		maxRetries: 3 
 	}
 }
