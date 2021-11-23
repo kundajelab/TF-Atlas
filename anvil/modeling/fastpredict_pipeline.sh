@@ -126,12 +126,6 @@ tee -a $logfile
 gunzip ${data_dir}/${experiment}_peaks_only.bed.gz
 
 
-ls ${data_dir}
-
-head ${data_dir}/${experiment}_combined.bed
-
-head ${data_dir}/${experiment}_peaks_only.bed
-
 
 # cp the input json for the rest of the commands 
 
@@ -160,9 +154,6 @@ $project_dir/splits.json | tee -a $logfile
 cp $splits_json $project_dir/splits.json
 
 
-cat $project_dir/input.json 
-cat $project_dir/testing_input.json
-cat $project_dir/splits.json
 
 
 #set threads based on number of peaks
