@@ -28,7 +28,7 @@ project_dir=/project
 logfile=$project_dir/${1}_reports.log
 touch $logfile
 
-# create the modisco directories
+# create the report directories
 reports_output_dir=$project_dir/reports
 echo $( timestamp ): "mkdir" $reports_output_dir | tee -a $logfile
 mkdir $reports_output_dir
@@ -54,7 +54,7 @@ shap_dir=$project_dir/shap
 echo $( timestamp ): "mkdir" $shap_dir | tee -a $logfile
 mkdir $shap_dir
 
-# create the shap directory
+# create the predictions directory
 predictions_metrics_dir=$project_dir/predictions
 echo $( timestamp ): "mkdir" $predictions_metrics_dir | tee -a $logfile
 mkdir $predictions_metrics_dir
@@ -68,6 +68,7 @@ modisco_counts_dir=$project_dir/modisco_counts
 echo $( timestamp ): "mkdir" $modisco_counts_dir | tee -a $logfile
 mkdir $modisco_counts_dir
 
+# create the tomtom directory
 tomtom_motif_database_dir=$project_dir/tomtom_motif_database
 echo $( timestamp ): "mkdir" $tomtom_motif_database_dir | tee -a $logfile
 mkdir $tomtom_motif_database_dir
@@ -76,18 +77,15 @@ tomtom_temp_dir=$project_dir/tomtom_temp_dir
 echo $( timestamp ): "mkdir" $tomtom_temp_dir | tee -a $logfile
 mkdir $tomtom_temp_dir
 
-reports_output_dir=$project_dir/reports
-echo $( timestamp ): "mkdir" $reports_output_dir | tee -a $logfile
-mkdir $reports_output_dir
 
 
 # copy down bed file, shap, predictions, modisco files
 
 
-echo $( timestamp ): "cp" $predictions_metrics ${predictions_dir}/ |\
+echo $( timestamp ): "cp" $predictions_metrics ${predictions_metrics_dir}/ |\
 tee -a $logfile 
 
-echo $predictions_metrics | sed 's/,/ /g' | xargs cp -t $predictions_dir/
+echo $predictions_metrics | sed 's/,/ /g' | xargs cp -t $predictions_metrics_dir/
 
 
 
