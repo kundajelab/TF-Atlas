@@ -171,7 +171,7 @@ do
     
 	TFM_PRED_PATH=$predictions_metrics_all_dir/${experiment}_split000_predictions.h5 \
 		TFM_SHAP_PATH=$shap_dir/${key}_scores.h5 \
-		TFM_TFM_PATH=$modisco_dir/$key/modisco_results.h5 \
+		TFM_TFM_PATH=$project_dir/modisco_${key}/modisco_results.h5 \
 		TFM_PEAKS_PATH=$peaks_path \
         TFM_TOMTOM_DB_PATH=${tomtom_motif_database_dir}/HOCOMOCO_JASPAR_motifs.txt \
         TFM_TOMTOM_TEMP_DIR=$tomtom_temp_dir/$key \
