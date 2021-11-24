@@ -141,7 +141,7 @@ test_chromosome=`jq '.["0"]["test"][0]' $project_dir/splits.json | sed 's/"//g'`
 #Performance
 TFM_PRED_PATH=$predictions_metrics_dir/ \
 	TFM_METRICS_DIR=$predictions_metrics_dir \
-	TEST_CHROMOSOME=$test_chromosome \
+	TEST_CHROMS=$test_chromosome \
 	jupyter nbconvert \
     --execute $reports_notebooks_dir/model_performance.ipynb --to HTML \
     --output $reports_output_dir/performance \
