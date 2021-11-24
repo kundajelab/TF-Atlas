@@ -79,6 +79,8 @@ workflow reports {
 	output {
 		File performance_reports = run_reports.performance_reports
 		Array [File] reports = run_reports.reports
+		File counts_motif_reports = run_reports.counts_motif_reports
+		File profile_motif_reports = run_reports.profile_motif_reports
 
 		
 	}
