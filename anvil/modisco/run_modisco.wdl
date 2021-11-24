@@ -41,7 +41,6 @@ task run_modisco {
 		cpu: "16"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
-		preemptible: 1
   		maxRetries: 3
 	}
 }
