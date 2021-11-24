@@ -17,7 +17,7 @@ shap=$4
 modisco_counts=$5
 modisco_profile=$6
 tomtom_database=${7}
-input_json=${8}
+splits_json=${8}
 
 reports_notebooks_dir="/my_scripts/TF-Atlas/anvil/reports/"
 
@@ -127,20 +127,21 @@ peaks_path=${data_dir}/${experiment}.bed
 # download input json template
 # the input json 
 
-echo $( timestamp ): "cp" $input_json \
-$project_dir/input.json | tee -a $logfile 
-cp $input_json $project_dir/input.json
+echo $( timestamp ): "cp" $splits_json \
+$project_dir/splits_json.json | tee -a $logfile 
+cp $splits_json $project_dir/input.splits_json
 
 
-# modify the input json for 
-echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/input.json 
-sed -i -e "s/<>/$1/g" $project_dir/input.json | tee -a $logfile 
+#get the test chromosome
 
+echo 'test_chromosome=jq .["0"]["test"][0] $project_dir/splits.json | sed s/"//g'
 
+test_chromosome=`jq '.["0"]["test"][0]' $project_dir/splits.json | sed 's/"//g'` 
 
 #Performance
 TFM_PRED_PATH=$predictions_metrics_dir/ \
 	TFM_METRICS_DIR=$predictions_metrics_dir \
+	TEST_CHROMOSOME=$test_chromosome \
 	jupyter nbconvert \
     --execute $reports_notebooks_dir/model_performance.ipynb --to HTML \
     --output $reports_output_dir/performance \
