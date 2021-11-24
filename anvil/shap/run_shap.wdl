@@ -20,12 +20,12 @@ task run_shap {
 		cd /my_scripts
 		git clone https://github.com/kundajelab/TF-Atlas.git
 		chmod -R 777 TF-Atlas
-		cd TF-Atlas/anvil/shap/
+		cd TF-Atlas/anvil/reports/
 
 		##shap
 
-		echo "run /my_scripts/TF-Atlas/anvil/shap/shap_pipeline.sh" ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
-		/my_scripts/TF-Atlas/anvil/shap/shap_pipeline.sh ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
+		echo "run /my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh" ${experiment} ${sep=',' predictions} ${sep=',' predictions}
+		/my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
 
 		echo "copying all files to cromwell_root folder"
 		
@@ -35,14 +35,14 @@ task run_shap {
 	
 	output {
 		Array[File] shap = glob("shap/*")
-		
+
 	
 	
 	}
 
 	runtime {
 		docker: 'vivekramalingam/tf-atlas:gcp-modeling'
-		memory: 30 + "GB"
+		memory: 32 + "GB"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
 		gpuType: "nvidia-tesla-p100"

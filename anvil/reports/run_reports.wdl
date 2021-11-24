@@ -1,16 +1,14 @@
 version 1.0
 
-task run_shap {
+task run_reports {
 	input {
 		String experiment
-		File input_json
-		File reference_file
-		File reference_file_index
-		File chrom_sizes
-		File chroms_txt
-		Array [File] bigwigs
 		File peaks
-		Array [File] model
+		Array [File] predictions
+		Array [File] shap
+		Array [File] modisco_counts
+		Array [File] modisco_profile
+		File [File] tomtom_database
 
 
   	}	
@@ -20,67 +18,63 @@ task run_shap {
 		cd /my_scripts
 		git clone https://github.com/kundajelab/TF-Atlas.git
 		chmod -R 777 TF-Atlas
-		cd TF-Atlas/anvil/shap/
+		cd TF-Atlas/anvil/reports/
 
 		##shap
 
-		echo "run /my_scripts/TF-Atlas/anvil/shap/shap_pipeline.sh" ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
-		/my_scripts/TF-Atlas/anvil/shap/shap_pipeline.sh ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
+		echo "run /my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh" ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
+		/my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh ${experiment} ${input_json} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${sep=',' bigwigs} ${peaks} ${sep=',' model}
 
 		echo "copying all files to cromwell_root folder"
 		
-		cp -r /project/shap /cromwell_root/
+		cp -r /project/reports /cromwell_root/
 		
 	}
 	
 	output {
-		Array[File] shap = glob("shap/*")
+
+		File performance_reports = glob("reports/*")
+		Array[File] reports = glob("reports/*")
 		
 	
 	
 	}
 
 	runtime {
-		docker: 'vivekramalingam/tf-atlas:gcp-modeling'
+		docker: 'vivekramalingam/tf-atlas:gcp-reports'
 		memory: 30 + "GB"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
-		gpuType: "nvidia-tesla-p100"
-		gpuCount: 1
-		nvidiaDriverVersion: "450.51.05" 
 		preemptible: 1
   		maxRetries: 3
 	}
 }
 
-workflow shap {
+workflow reports {
 	input {
 		String experiment
-		File input_json
-		File reference_file
-		File reference_file_index
-		File chrom_sizes
-		File chroms_txt
-		Array [File] bigwigs
 		File peaks
-		Array [File] model
+		Array [File] predictions
+		Array [File] shap
+		Array [File] modisco_counts
+		Array [File] modisco_profile
+		File [File] tomtom_database
 
 	}
 
-	call run_shap {
+	call run_reports {
 		input:
 			experiment = experiment,
-			input_json = input_json,
-			reference_file = reference_file,
-			reference_file_index = reference_file_index,	
-			chrom_sizes = chrom_sizes,
-			chroms_txt = chroms_txt,
-			bigwigs = bigwigs,
 			peaks = peaks,
-			model = model
+			predictions = predictions,
+			shap = shap,	
+			modisco_counts = modisco_counts,
+			modisco_profile = modisco_profile,
+			tomtom_database = tomtom_database
  	}
 	output {
-		Array[File] shap = run_shap.shap
+		File performance_reports = run_reports.performance_reports
+		Array [File] reports = run_reports.reports
 
 		
 	}
