@@ -30,14 +30,15 @@ task run_reports {
 		echo "copying all files to cromwell_root folder"
 		
 		cp -r /project/reports /cromwell_root/
+
 		
 	}
 	
 	output {
 
-		File performance_reports = glob("reports/performance.html")
-		File counts_motif_reports = glob("reports/counts_tfm_results.html")
-		File profile_motif_reports = glob("reports/profile_tfm_results.html")
+		File performance_reports = "reports/performance.html"
+		File counts_motif_reports = "reports/counts_tfm_results.html"
+		File profile_motif_reports = "reports/profile_tfm_results.html"
 		Array[File] reports = glob("reports/*")
 		
 	
