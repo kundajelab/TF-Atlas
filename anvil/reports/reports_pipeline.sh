@@ -131,6 +131,11 @@ tee -a $logfile
 
 cp $peaks ${data_dir}/${experiment}.bed.gz
 
+echo $( timestamp ): "gunzip" ${data_dir}/${experiment}.bed.gz |\
+tee -a $logfile 
+
+gunzip ${data_dir}/${experiment}.bed.gz
+
 peaks_path=${data_dir}/${experiment}.bed
 
 # download input json template
