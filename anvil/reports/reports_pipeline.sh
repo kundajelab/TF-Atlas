@@ -127,7 +127,7 @@ peaks_path=${data_dir}/${experiment}.bed
 
 echo $( timestamp ): "cp" $splits_json \
 $project_dir/splits_json.json | tee -a $logfile 
-cp $splits_json $project_dir/input.splits_json
+cp $splits_json $project_dir/splits.json
 
 
 #get the test chromosome
