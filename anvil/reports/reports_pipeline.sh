@@ -180,6 +180,7 @@ do
         --to HTML --output $reports_output_dir/${key}_tfm_results \
         --ExecutePreprocessor.timeout=-1 &
 done
+wait
 
 # #Examples of seqlets and profile predictions
 # for key in profile counts
