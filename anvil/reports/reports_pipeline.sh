@@ -12,12 +12,13 @@ function timestamp {
 
 experiment=$1
 peaks=$2
-predictions_metrics=$3
-shap=$4
-modisco_counts=$5
-modisco_profile=$6
-tomtom_database=${7}
-splits_json=${8}
+predictions_metrics_test=$3
+predictions_metrics_all=$4
+shap=$5
+modisco_counts=$6
+modisco_profile=$7
+tomtom_database=${8}
+splits_json=${9}
 
 reports_notebooks_dir="/my_scripts/TF-Atlas/anvil/reports/"
 
@@ -54,10 +55,14 @@ shap_dir=$project_dir/shap
 echo $( timestamp ): "mkdir" $shap_dir | tee -a $logfile
 mkdir $shap_dir
 
-# create the predictions directory
-predictions_metrics_dir=$project_dir/predictions
-echo $( timestamp ): "mkdir" $predictions_metrics_dir | tee -a $logfile
-mkdir $predictions_metrics_dir
+# create the predictions directories
+predictions_metrics_test_dir=$project_dir/predictions_test
+echo $( timestamp ): "mkdir" $predictions_metrics_test_dir | tee -a $logfile
+mkdir $predictions_metrics_test_dir
+
+predictions_metrics_all_dir=$project_dir/predictions_all
+echo $( timestamp ): "mkdir" $predictions_metrics_all_dir | tee -a $logfile
+mkdir $predictions_metrics_all_dir
 
 # create the modisco directories
 modisco_profile_dir=$project_dir/modisco_profile
@@ -82,10 +87,16 @@ mkdir $tomtom_temp_dir
 # copy down bed file, shap, predictions, modisco files
 
 
-echo $( timestamp ): "cp" $predictions_metrics ${predictions_metrics_dir}/ |\
+echo $( timestamp ): "cp" $predictions_metrics_test ${predictions_metrics_test_dir}/ |\
 tee -a $logfile 
 
-echo $predictions_metrics | sed 's/,/ /g' | xargs cp -t $predictions_metrics_dir/
+echo $predictions_metrics_test | sed 's/,/ /g' | xargs cp -t $predictions_metrics_test_dir/
+
+
+echo $( timestamp ): "cp" $predictions_metrics_all ${predictions_metrics_all_dir}/ |\
+tee -a $logfile 
+
+echo $predictions_metrics_all | sed 's/,/ /g' | xargs cp -t $predictions_metrics_all_dir/
 
 
 
@@ -137,8 +148,8 @@ echo 'test_chromosome=jq .["0"]["test"][0] $project_dir/splits.json | sed s/"//g
 test_chromosome=`jq '.["0"]["test"][0]' $project_dir/splits.json | sed 's/"//g'` 
 
 #Performance
-TFM_PRED_PATH=$predictions_metrics_dir/${experiment}_split000_predictions.h5 \
-	TFM_METRICS_DIR=$predictions_metrics_dir \
+TFM_PRED_PATH=$predictions_metrics_test_dir/${experiment}_split000_predictions.h5 \
+	TFM_METRICS_DIR=$predictions_metrics_test_dir \
 	TEST_CHROMS=$test_chromosome \
 	jupyter nbconvert \
     --execute $reports_notebooks_dir/model_performance.ipynb --to HTML \
@@ -153,7 +164,7 @@ do
     echo $( timestamp ): "mkdir" $tomtom_temp_dir/$key | tee -a $logfile
     mkdir $tomtom_temp_dir/$key
     
-	TFM_PRED_PATH=$predictions_metrics_dir/${experiment}_split000_predictions.h5 \
+	TFM_PRED_PATH=$predictions_metrics_all_dir/${experiment}_split000_predictions.h5 \
 		TFM_SHAP_PATH=$shap_dir/${key}_scores.h5 \
 		TFM_TFM_PATH=$modisco_dir/$key/modisco_results.h5 \
 		TFM_PEAKS_PATH=$peaks_path \
