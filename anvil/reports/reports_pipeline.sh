@@ -1,15 +1,13 @@
 #!/bin/bash
 
+function timestamp {
+    # Function to get the current time with the new line character
+    # removed 
+    
+    # current time
+    date +"%Y-%m-%d_%H-%M-%S" | tr -d '\n'
+}
 
-mkdir /project
-project_dir=/project
-
-# create the log file
-logfile=$project_dir/${1}_reports.log
-touch $logfile
-
-# import the utils script
-. utils.sh
 
 
 experiment=$1
@@ -22,6 +20,13 @@ tomtom_database=${7}
 input_json=${8}
 
 reports_notebooks_dir="/my_scripts/TF-Atlas/anvil/reports/"
+
+mkdir /project
+project_dir=/project
+
+# create the log file
+logfile=$project_dir/${1}_reports.log
+touch $logfile
 
 # create the modisco directories
 reports_output_dir=$project_dir/reports
