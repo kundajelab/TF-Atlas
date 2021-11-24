@@ -9,7 +9,7 @@ task run_reports {
 		Array [File] modisco_counts
 		Array [File] modisco_profile
 		File tomtom_database
-		File input_json
+		File splits_json
 
 
   	}	
@@ -23,8 +23,8 @@ task run_reports {
 
 		##shap
 
-		echo "run /my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh" ${experiment} ${peaks} ${sep=',' predictions} ${sep=',' shap} ${sep=',' modisco_counts} ${sep=',' modisco_profile} ${tomtom_database} ${input_json}
-		/my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh ${experiment} ${peaks} ${sep=',' predictions} ${sep=',' shap} ${sep=',' modisco_counts} ${sep=',' modisco_profile} ${tomtom_database} ${input_json}
+		echo "run /my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh" ${experiment} ${peaks} ${sep=',' predictions} ${sep=',' shap} ${sep=',' modisco_counts} ${sep=',' modisco_profile} ${tomtom_database} ${splits_json}
+		/my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh ${experiment} ${peaks} ${sep=',' predictions} ${sep=',' shap} ${sep=',' modisco_counts} ${sep=',' modisco_profile} ${tomtom_database} ${splits_json}
 
 		echo "copying all files to cromwell_root folder"
 		
@@ -59,7 +59,7 @@ workflow reports {
 		Array [File] modisco_counts
 		Array [File] modisco_profile
 		File tomtom_database
-		File input_json
+		File splits_json
 
 	}
 
@@ -72,7 +72,7 @@ workflow reports {
 			modisco_counts = modisco_counts,
 			modisco_profile = modisco_profile,
 			tomtom_database = tomtom_database,
-			input_json = input_json
+			splits_json = splits_json
  	}
 	output {
 		File performance_reports = run_reports.performance_reports
