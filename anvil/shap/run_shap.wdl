@@ -44,10 +44,9 @@ task run_shap {
 		memory: 30 + "GB"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
-		gpuType: "nvidia-tesla-p100"
+		gpuType: "nvidia-tesla-k80"
 		gpuCount: 1
 		nvidiaDriverVersion: "450.51.05" 
-		preemptible: 1
   		maxRetries: 3
 	}
 }
