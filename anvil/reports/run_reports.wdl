@@ -23,8 +23,8 @@ task run_reports {
 
 		##shap
 
-		echo "run /my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh" ${experiment} ${peaks} ${sep=',' predictions} ${sep=',' shap} ${sep=',' modisco_counts} ${sep=',' modisco_profile} ${tomtom_database}
-		/my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh ${experiment} ${peaks} ${sep=',' predictions} ${sep=',' shap} ${sep=',' modisco_counts} ${sep=',' modisco_profile} ${tomtom_database}
+		echo "run /my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh" ${experiment} ${peaks} ${sep=',' predictions} ${sep=',' shap} ${sep=',' modisco_counts} ${sep=',' modisco_profile} ${tomtom_database} ${input_json}
+		/my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh ${experiment} ${peaks} ${sep=',' predictions} ${sep=',' shap} ${sep=',' modisco_counts} ${sep=',' modisco_profile} ${tomtom_database} ${input_json}
 
 		echo "copying all files to cromwell_root folder"
 		
@@ -46,7 +46,6 @@ task run_reports {
 		memory: 30 + "GB"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
-		preemptible: 1
   		maxRetries: 3
 	}
 }
