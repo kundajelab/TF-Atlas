@@ -34,7 +34,9 @@ task run_reports {
 	
 	output {
 
-		File performance_reports = glob("reports/*")
+		File performance_reports = glob("reports/performance.html")
+		File counts_motif_reports = glob("reports/counts_tfm_results.html")
+		File profile_motif_reports = glob("reports/profile_tfm_results.html")
 		Array[File] reports = glob("reports/*")
 		
 	
