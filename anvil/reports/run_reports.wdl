@@ -31,6 +31,8 @@ task run_reports {
 		
 		cp -r /project/reports /cromwell_root/
 
+		ls /project/reports
+
 		
 	}
 	
