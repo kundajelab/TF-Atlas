@@ -54,7 +54,7 @@ workflow modisco {
 
 	}
 
-	mem_gb = ceil(30.2)
+	Int mem_gb=ceil(30.2)
 
 	call run_modisco {
 		input:
