@@ -39,7 +39,6 @@ task run_modisco {
 	runtime {
 		docker: 'vivekramalingam/tf-atlas:gcp-modeling'
 		memory: mem_gb + "GB"
-		cpu: "16"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
   		maxRetries: 3
