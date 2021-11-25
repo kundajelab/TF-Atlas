@@ -37,8 +37,25 @@ task run_reports {
 	output {
 
 		File performance_reports = "reports/performance.html"
+
+
 		File counts_motif_reports = "reports/counts_tfm_results.html"
 		File profile_motif_reports = "reports/profile_tfm_results.html"
+
+
+		String counts_motif1 = read_string("reports/counts_motif0.txt")
+		String counts_motif2 = read_string("reports/counts_motif1.txt")
+		String counts_motif3 = read_string("reports/counts_motif2.txt")
+		String counts_motif4 = read_string("reports/counts_motif3.txt")
+		String counts_motif5 = read_string("reports/counts_motif4.txt")
+
+		String profile_motif1 = read_string("reports/profile_motif0.txt")
+		String profile_motif2 = read_string("reports/profile_motif1.txt")
+		String profile_motif3 = read_string("reports/profile_motif2.txt")
+		String profile_motif4 = read_string("reports/profile_motif3.txt")
+		String profile_motif5 = read_string("reports/profile_motif4.txt")
+
+
 		Array[File] reports = glob("reports/*")
 		
 	
@@ -86,6 +103,18 @@ workflow reports {
 		File counts_motif_reports = run_reports.counts_motif_reports
 		File profile_motif_reports = run_reports.profile_motif_reports
 
-		
+		String counts_motif1 = run_reports.counts_motif1
+		String counts_motif2 = run_reports.counts_motif2
+		String counts_motif3 = run_reports.counts_motif3
+		String counts_motif4 = run_reports.counts_motif4
+		String counts_motif5 = run_reports.counts_motif5
+
+		String profile_motif1 = run_reports.counts_motif1
+		String profile_motif2 = run_reports.counts_motif2
+		String profile_motif3 = run_reports.counts_motif3
+		String profile_motif4 = run_reports.counts_motif4
+		String profile_motif5 = run_reports.counts_motif5
+
+
 	}
 }

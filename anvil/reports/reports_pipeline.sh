@@ -175,6 +175,8 @@ do
 		TFM_PEAKS_PATH=$peaks_path \
         TFM_TOMTOM_DB_PATH=${tomtom_motif_database_dir}/HOCOMOCO_JASPAR_motifs.txt \
         TFM_TOMTOM_TEMP_DIR=$tomtom_temp_dir/$key \
+        TFM_KEY=$key \
+        TFM_REPORTS_DIR=$reports_output_dir \
 		jupyter nbconvert \
         --execute $reports_notebooks_dir/view_tfmodisco_results.ipynb \
         --to HTML --output $reports_output_dir/${key}_tfm_results \
