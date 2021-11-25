@@ -50,11 +50,13 @@ workflow modisco {
 	input {
 		String experiment
 		Array [File] shap
-		Int number_of_peaks
+		File peak_bed_for_mem_calculation
 
 	}
 
-	Int mem_gb=ceil(number_of_peaks/15000.0)*32
+	Float size_of_peak_file = size(peak_bed_for_mem_calculation, "KB")
+
+	Int mem_gb=ceil(size_of_peak_file/250.0)*32
 
 
 	call run_modisco {
