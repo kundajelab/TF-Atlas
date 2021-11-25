@@ -58,6 +58,7 @@ workflow modisco {
 	Int mem_gb=ceil(size_of_peak_file/250.0)*32
 
 
+
 	call run_modisco {
 		input:
 			experiment = experiment,
