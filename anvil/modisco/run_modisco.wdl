@@ -54,11 +54,13 @@ workflow modisco {
 
 	}
 
+	mem_gb = ceil(30.2)
+
 	call run_modisco {
 		input:
 			experiment = experiment,
 			shap = shap,
-			mem_gb = ceil((number_of_peaks/20000)*30)
+			mem_gb = mem_gb
  	}
 	output {
 		Array[File] modisco_profile = run_modisco.modisco_profile
