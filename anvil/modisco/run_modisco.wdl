@@ -4,6 +4,7 @@ task run_modisco {
 	input {
 		String experiment
 		Array [File] shap
+		Int mem_gb
 
 
   	}	
@@ -37,7 +38,7 @@ task run_modisco {
 
 	runtime {
 		docker: 'vivekramalingam/tf-atlas:gcp-modeling'
-		memory: 64 + "GB"
+		memory: mem_gb + "GB"
 		cpu: "16"
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
@@ -49,13 +50,15 @@ workflow modisco {
 	input {
 		String experiment
 		Array [File] shap
+		Int number_of_peaks
 
 	}
 
 	call run_modisco {
 		input:
 			experiment = experiment,
-			shap = shap
+			shap = shap,
+			mem_gb = ceil((number_of_peaks/20000)*30)
  	}
 	output {
 		Array[File] modisco_profile = run_modisco.modisco_profile
