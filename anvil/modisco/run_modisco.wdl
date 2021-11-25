@@ -54,7 +54,10 @@ workflow modisco {
 
 	}
 
-	Int mem_gb=ceil(30.2)
+	Int temp=ceil(number_of_peaks/15000)
+	Int mem_gb=ceil(temp*32)
+
+
 
 	call run_modisco {
 		input:
