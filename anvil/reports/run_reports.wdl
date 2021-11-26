@@ -111,11 +111,11 @@ workflow reports {
 		String counts_motif4 = run_reports.counts_motif4
 		String counts_motif5 = run_reports.counts_motif5
 
-		String profile_motif1 = run_reports.counts_motif1
-		String profile_motif2 = run_reports.counts_motif2
-		String profile_motif3 = run_reports.counts_motif3
-		String profile_motif4 = run_reports.counts_motif4
-		String profile_motif5 = run_reports.counts_motif5
+		String profile_motif1 = run_reports.profile_motif1
+		String profile_motif2 = run_reports.profile_motif2
+		String profile_motif3 = run_reports.profile_motif3
+		String profile_motif4 = run_reports.profile_motif4
+		String profile_motif5 = run_reports.profile_motif5
 
 
 	}
