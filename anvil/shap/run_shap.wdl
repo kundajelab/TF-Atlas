@@ -42,8 +42,8 @@ task run_shap {
 	runtime {
 		docker: 'vivekramalingam/tf-atlas:gcp-modeling'
 		memory: 30 + "GB"
-		bootDiskSizeGb: 100
-		disks: "local-disk 250 HDD"
+		bootDiskSizeGb: 50
+		disks: "local-disk 100 HDD"
 		gpuType: "nvidia-tesla-k80"
 		gpuCount: 1
 		nvidiaDriverVersion: "450.51.05" 
