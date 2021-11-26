@@ -5,6 +5,7 @@ task run_modisco {
 		String experiment
 		Array [File] shap
 		Int mem_gb
+		Int number_of_cpus
 
 
   	}	
@@ -18,8 +19,8 @@ task run_modisco {
 
 		##modisco
 
-		echo "run /my_scripts/TF-Atlas/anvil/modisco/modisco_pipeline.sh" ${experiment} ${sep=',' shap}
-		/my_scripts/TF-Atlas/anvil/modisco/modisco_pipeline.sh ${experiment} ${sep=',' shap}
+		echo "run /my_scripts/TF-Atlas/anvil/modisco/modisco_pipeline.sh" ${experiment} ${sep=',' shap} ${number_of_cpus}
+		/my_scripts/TF-Atlas/anvil/modisco/modisco_pipeline.sh ${experiment} ${sep=',' shap} ${number_of_cpus}
 
 		echo "copying all files to cromwell_root folder"
 		
@@ -39,6 +40,7 @@ task run_modisco {
 	runtime {
 		docker: 'vivekramalingam/tf-atlas:gcp-modeling'
 		memory: mem_gb + "GB"
+		cpu: number_of_cpus
 		bootDiskSizeGb: 100
 		disks: "local-disk 250 HDD"
   		maxRetries: 3
@@ -57,13 +59,16 @@ workflow modisco {
 
 	Int mem_gb=ceil(size_of_peak_file/250.0)*32
 
+	Int number_of_cpus=ceil(size_of_peak_file/250.0)*8
+
 
 
 	call run_modisco {
 		input:
 			experiment = experiment,
 			shap = shap,
-			mem_gb = mem_gb
+			mem_gb = mem_gb,
+			number_of_cpus = number_of_cpus
  	}
 	output {
 		Array[File] modisco_profile = run_modisco.modisco_profile
