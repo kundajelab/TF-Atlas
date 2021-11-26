@@ -54,8 +54,8 @@ echo $shap | sed 's/,/ /g' | xargs cp -t $shap_dir/
 echo $( timestamp ): "
 motif_discovery \\
     --scores-path $shap_dir/profile_scores.h5 \\
-    --output-directory $modisco_profile_dir" \\
-    --number-of-cpus $number_of_cpus | tee -a $logfile
+    --output-directory $modisco_profile_dir \\
+    --number-of-cpus $number_of_cpus" | tee -a $logfile
 
 motif_discovery \
     --scores-path $shap_dir/profile_scores.h5 \
@@ -65,8 +65,8 @@ motif_discovery \
 echo $( timestamp ): "
 motif_discovery \\
     --scores-path $shap_dir/counts_scores.h5 \\
-    --output-directory $modisco_counts_dir"\\
-    --number-of-cpus $number_of_cpus | tee -a $logfile
+    --output-directory $modisco_counts_dir\\
+    --number-of-cpus $number_of_cpus" | tee -a $logfile
 
 motif_discovery \
     --scores-path $shap_dir/counts_scores.h5 \
