@@ -51,7 +51,6 @@ echo $shap | sed 's/,/ /g' | xargs cp -t $shap_dir/
 
 #Step 2: Run modisco on counts and profile
 
-free -g -s 30 &
 
 echo $( timestamp ): "
 motif_discovery \\
