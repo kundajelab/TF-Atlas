@@ -69,7 +69,7 @@ task run_reports {
 		memory: 20 + "GB"
 		bootDiskSizeGb: 50
 		disks: "local-disk 100 HDD"
-  		maxRetries: 3
+  		maxRetries: 1
 	}
 }
 
