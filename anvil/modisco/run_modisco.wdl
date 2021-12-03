@@ -59,7 +59,7 @@ workflow modisco {
 
 	Int mem_gb=ceil(size_of_peak_file/250.0)*32
 
-	Int number_of_cpus=ceil(size_of_peak_file/250.0)*8
+	Int number_of_cpus=ceil(size_of_peak_file/500.0)*8
 
 
 
