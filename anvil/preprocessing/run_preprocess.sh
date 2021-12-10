@@ -1,15 +1,13 @@
 #!/bin/bash
 
-# TF-Atlas pipeline
+# Chrom-Atlas pipeline
 # Step 1. Copy reference files from gcp
 # Step 2. Download bams and peaks file for the experiment
 # Step 3. Process bam files to generate bigWigs
-# Step 4. Modeling, predictions, metrics, shap, modisco, embeddings
-# Step 5. Generate reports
+# Step 4. Generate PWM from bigwig
 
 # import the utils script
 source ./utils.sh
-
 
 
 # path to json file with pipeline params
@@ -31,43 +29,13 @@ alignments=`jq .alignments $pipeline_json | sed 's/"//g'`
 
 alignments_md5sums=`jq .alignments_md5sums $pipeline_json | sed 's/"//g'`
 
-control_unfiltered_alignments=\
-`jq .control_unfiltered_alignments $pipeline_json | sed 's/"//g'`
-
-control_unfiltered_alignments_md5sums=\
-`jq .control_unfiltered_alignments_md5sums $pipeline_json | sed 's/"//g'`
-
-control_alignments=`jq .control_alignments $pipeline_json | sed 's/"//g'`
-
-control_alignments_md5sums=\
-`jq .control_alignments_md5sums $pipeline_json | sed 's/"//g'`
 
 peaks=`jq .peaks $pipeline_json | sed 's/"//g'`
 
 peaks_md5sum=`jq .peaks_md5sum $pipeline_json | sed 's/"//g'`
 
-has_control=`jq .has_control $pipeline_json | sed 's/"//g'`
+assay_type=`jq .assay_type $pipeline_json | sed 's/"//g'`
 
-stranded=`jq .stranded $pipeline_json | sed 's/"//g'`
-
-model_arch_name=`jq .model_arch_name $pipeline_json | sed 's/"//g'`
-
-sequence_generator_name=\
-`jq .sequence_generator_name $pipeline_json | sed 's/"//g'`
-
-splits_json_path=`jq .splits_json_path $pipeline_json | sed 's/"//g'`
-
-test_chroms=`jq .test_chroms $pipeline_json | sed 's/"//g'`
-
-tuning=`jq .tuning $pipeline_json | sed 's/"//g'`
-
-learning_rate=`jq .learning_rate $pipeline_json | sed 's/"//g'`
-
-counts_loss_weight=`jq .counts_loss_weight $pipeline_json | sed 's/"//g'`
-
-epochs=`jq .epochs $pipeline_json | sed 's/"//g'`
-
-gcp_bucket=`jq .gcp_bucket $pipeline_json | sed 's/"//g'`
 
 encode_access_key=$2
 
@@ -162,32 +130,13 @@ wait_for_jobs_to_finish "Download"
 
 # 3.1 preprocess experiment bams
 ./preprocessing.sh $experiment "$unfiltered_alignments" "$alignments" \
-$downloads_dir $intermediates_dir $bigWigs_dir $stranded False $reference_dir \
-$logfile &
+$downloads_dir $intermediates_dir $bigWigs_dir  $reference_dir \
+$logfile  $assay_type&
 
 echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
 \"$unfiltered_alignments\" \"$alignments\" $downloads_dir $intermediates_dir \
-$bigWigs_dir $stranded False $reference_dir $logfile  | tee -a $logfile
-
-if [ "$has_control" = "True" ]
-then
-    # 3.2 preprocess experiment control bams
-    ./preprocessing.sh $experiment "$control_unfiltered_alignments" \
-    "$control_alignments" $downloads_dir $intermediates_dir $bigWigs_dir \
-    $stranded True $reference_dir $logfile &
-    
-    echo $( timestamp ): [$!] "./preprocessing.sh" $experiment \
-    \"$control_unfiltered_alignments\" \"$control_alignments\" $downloads_dir \
-    $intermediates_dir $bigWigs_dir $stranded True $reference_dir $logfile | \
-    tee -a $logfile
-fi
+$bigWigs_dir $reference_dir $logfile $assay_type | tee -a $logfile
 
 wait_for_jobs_to_finish "Preprocessing"
 
-# Step pre_4: Create the input json for the experiment that will
-# be used in training
-echo $( timestamp ): "python create_input_json.py" $experiment $peaks True \
-True $bigWigs_dir $downloads_dir . | tee -a $logfile
-
-python create_input_json.py $experiment $peaks True True $bigWigs_dir \
-$downloads_dir .
+# Step 4. Check if ATAC/DNASE shifts are correct
