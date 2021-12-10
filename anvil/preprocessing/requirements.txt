@@ -1,0 +1,6 @@
+pandas
+numpy
+pyfaidx
+pyBigWig
+matplotlib
+argparse

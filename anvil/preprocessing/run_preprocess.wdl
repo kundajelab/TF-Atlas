@@ -37,7 +37,7 @@ task run_preprocess {
 	output {
 		File peaks_bed = "peaks.bed.gz"
 		Array[File] output_bw = glob("bigWigs/*.bigWig")
-	
+		Array[File] pwm_bw = glob("bigWigs/*.png")
 	}
 
 	runtime {
@@ -75,5 +75,6 @@ workflow preprocess {
 	output {
 		File peaks_bed = run_preprocess.peaks_bed
 		Array[File] output_bw = run_preprocess.output_bw
+		Array[File] pwm_bw = run_preprocess.pwm_bw
 	}
 }

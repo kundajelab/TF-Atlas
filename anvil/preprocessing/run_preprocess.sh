@@ -140,3 +140,20 @@ $bigWigs_dir $reference_dir $logfile $assay_type | tee -a $logfile
 wait_for_jobs_to_finish "Preprocessing"
 
 # Step 4. Check if ATAC/DNASE shifts are correct
+# create pwm image form bigwig
+tag=""
+echo $( timestamp ): "
+build_pwm_from_bigwig.py \\
+    -i $bigWigs_dir/$experiment$tag.bigWig \\
+    -g $reference_dir/hg38.genome.fa \\
+    -o $bigWigs_dir/$experiment$tag.png \\
+    -c \"chr20\" \\
+    -cz $reference_dir/chrom.sizes  | tee -a $logfile
+    
+python \
+    build_pwm_from_bigwig.py \
+    -i $bigWigs_dir/$experiment$tag.bigWig \
+    -g $reference_dir/hg38.genome.fa \
+    -o $bigWigs_dir/$experiment$tag.png \
+    -c "chr20" \
+    -cz $reference_dir/chrom.sizes 
