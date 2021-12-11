@@ -155,7 +155,7 @@ do
         TFM_ANALYSIS_DIR=$analysis_output_dir \
 		jupyter nbconvert \
         --execute $analysis_notebooks_dir/motif_contributions.ipynb \
-        --to HTML --output $analysis_output_dir/${key}_tfm_results \
+        --to HTML --output $analysis_output_dir/${key}_motif_contributions_results \
         --ExecutePreprocessor.timeout=-1 &
 done
 wait

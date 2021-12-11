@@ -38,9 +38,9 @@ task run_reports {
 	output {
 
 
-		String counts_motif_contributions = read_string("reports/counts_motif_contributions.txt")
+		String counts_motif_contributions = read_string("analysis/counts_motif_contributions.txt")
 
-		String profile_motif_contributions = read_string("reports/profile_motif_contributions.txt")
+		String profile_motif_contributions = read_string("analysis/profile_motif_contributions.txt")
 		
 	
 	
