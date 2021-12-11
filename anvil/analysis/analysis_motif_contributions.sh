@@ -137,18 +137,6 @@ gunzip ${data_dir}/${experiment}.bed.gz
 
 peaks_path=${data_dir}/${experiment}.bed
 
-# for testing if nbconvertworks
-
-test_chromosome=chr11 
-
-#Performance
-TFM_PRED_PATH=$predictions_metrics_test_dir/${experiment}_split000_predictions.h5 \
-    TFM_METRICS_DIR=$predictions_metrics_test_dir \
-    TEST_CHROMS=$test_chromosome \
-    jupyter nbconvert \
-    --execute $analysis_notebooks_dir/model_performance.ipynb --to HTML \
-    --output $reports_output_dir/performance \
-    --ExecutePreprocessor.timeout=-1
 
 #motif contributions results
 for key in profile counts
