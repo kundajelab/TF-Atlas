@@ -81,9 +81,9 @@ workflow reports {
  	}
 	output {
 
-		String counts_motif1 = run_reports.counts_motif_contributions
+		String counts_motif_contributions = run_reports.counts_motif_contributions
 
-		String profile_motif1 = run_reports.profile_motif_contributions
+		String profile_motif_contributions = run_reports.profile_motif_contributions
 
 
 	}
