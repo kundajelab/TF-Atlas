@@ -1,0 +1,4 @@
+- Where is the script to generate the json files? - I just need to understand the directory structure of reading in the bigwigs and peaks and non peaks
+- Need to change gc-matching pipeline to output only non peaks
+- How does the shap work? - Need to figure out if I have to change the shap scripts - If not I can just change current scripts to fit modisco input
+- what is the peaks.ipynb notebook for?
