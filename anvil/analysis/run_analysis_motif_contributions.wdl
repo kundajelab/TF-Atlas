@@ -48,7 +48,7 @@ task run_reports {
 
 	runtime {
 		docker: 'vivekramalingam/tf-atlas:gcp-reports'
-		memory: 20 + "GB"
+		memory: 16 + "GB"
 		bootDiskSizeGb: 40
 		disks: "local-disk 50 HDD"
   		maxRetries: 1
