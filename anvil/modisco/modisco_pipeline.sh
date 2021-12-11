@@ -51,7 +51,7 @@ echo $shap | sed 's/,/ /g' | xargs cp -t $shap_dir/
 
 #Step 2: Run modisco on counts and profile
 
-free -g -s 30 &
+free -g -s 30 | tee -a $logfile &
 
 echo $( timestamp ): "
 motif_discovery \\
@@ -74,5 +74,7 @@ motif_discovery \
     --scores-path $shap_dir/counts_scores.h5 \
     --output-directory $modisco_counts_dir \
     --number-of-cpus $number_of_cpus
+
+awk '$1=="Mem:"{print $3}' $logfile | sort -n | tail -n 1 > /cromwell_root/max_memory_gb.txt
 
 

@@ -4,7 +4,6 @@ task run_modisco {
 	input {
 		String experiment
 		Array [File] shap
-		Int mem_gb
 		Int number_of_cpus
 
 
@@ -32,8 +31,8 @@ task run_modisco {
 	output {
 		Array[File] modisco_profile = glob("modisco_profile/*")
 		Array[File] modisco_counts = glob("modisco_counts/*")
+		Int max_memory_used_gb = read_int("max_memory_used_gb.txt")
 		
-	
 	
 	}
 
@@ -52,13 +51,12 @@ workflow modisco {
 		String experiment
 		Array [File] shap
 		File peak_bed_for_mem_calculation
-		Int mem_gb
 
 	}
 
 	Float size_of_peak_file = size(peak_bed_for_mem_calculation, "KB")
 
-	# Int mem_gb=ceil(size_of_peak_file/125.0)*16
+	Int mem_gb=ceil(size_of_peak_file/125.0)*16
 
 	Int number_of_cpus=ceil(size_of_peak_file/750.0)*8
 
@@ -68,12 +66,12 @@ workflow modisco {
 		input:
 			experiment = experiment,
 			shap = shap,
-			mem_gb = mem_gb,
 			number_of_cpus = number_of_cpus
  	}
 	output {
 		Array[File] modisco_profile = run_modisco.modisco_profile
 		Array[File] modisco_counts = run_modisco.modisco_counts
+		Int max_memory_used_gb = run_modisco.max_memory_used_gb
 
 		
 	}
