@@ -146,7 +146,7 @@ TFM_PRED_PATH=$predictions_metrics_test_dir/${experiment}_split000_predictions.h
     TFM_METRICS_DIR=$predictions_metrics_test_dir \
     TEST_CHROMS=$test_chromosome \
     jupyter nbconvert \
-    --execute $reports_notebooks_dir/model_performance.ipynb --to HTML \
+    --execute $analysis_notebooks_dir/model_performance.ipynb --to HTML \
     --output $reports_output_dir/performance \
     --ExecutePreprocessor.timeout=-1
 
@@ -164,7 +164,7 @@ do
         TFM_TOMTOM_DB_PATH=${tomtom_motif_database_dir}/HOCOMOCO_JASPAR_motifs.txt \
         TFM_TOMTOM_TEMP_DIR=$tomtom_temp_dir/$key \
         TFM_KEY=$key \
-        TFM_analysis_DIR=$analysis_output_dir \
+        TFM_ANALYSIS_DIR=$analysis_output_dir \
 		jupyter nbconvert \
         --execute $analysis_notebooks_dir/motif_contributions.ipynb \
         --to HTML --output $analysis_output_dir/${key}_tfm_results \
