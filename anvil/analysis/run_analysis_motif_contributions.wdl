@@ -38,12 +38,9 @@ task run_reports {
 	output {
 
 
-		String counts_motif1 = read_string("reports/counts_motif_contributions.txt")
+		String counts_motif_contributions = read_string("reports/counts_motif_contributions.txt")
 
-		String profile_motif1 = read_string("reports/profile_motif_contributions.txt")
-
-
-		Array[File] reports = glob("reports/*")
+		String profile_motif_contributions = read_string("reports/profile_motif_contributions.txt")
 		
 	
 	
