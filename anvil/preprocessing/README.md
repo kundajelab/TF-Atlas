@@ -6,6 +6,7 @@
 - Do I need to change the Docker file ? - only 2 lines which might be different in Docker - why git clone if this line in docker
 - What changed in the create_metadata notebook
 - make a check if all are atac or dnase
+- Is awk a unix tool already installed?
 
 # Copy down the TF-Atlas scripts
 RUN git clone https://github.com/kundajelab/TF-Atlas.git
