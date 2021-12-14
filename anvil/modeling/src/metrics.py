@@ -121,7 +121,7 @@ def main():
     test_peaks_pred_logcts_wo_bias = np.log(test_peaks_pred_cts_wo_bias)
 
     # for non peaks
-    test_nonpeaks_pred_logits_wo_bias = test_nonpeaks_pred_logits - test_peaks_nonpred_bias_logits
+    test_nonpeaks_pred_logits_wo_bias = test_nonpeaks_pred_logits - test_nonpeaks_pred_bias_logits
 
     test_nonpeaks_pred_cts_wo_bias = np.exp(test_nonpeaks_pred_logcts)-np.exp(test_nonpeaks_pred_bias_logcts)
 
@@ -184,7 +184,7 @@ def main():
     metrics['chrombpnet_cts_pearson_nonpeaks_wo_bias'] = scipy.stats.pearsonr(*cur_pair)[0]
     metrics['chrombpnet_cts_spearman_nonpeaks_wo_bias'] = scipy.stats.spearmanr(*cur_pair)[0]
 
-    cur_pair = (pnoneaks_test_logcts, test_nonpeaks_pred_bias_logcts.ravel())
+    cur_pair = (nonpeaks_test_logcts, test_nonpeaks_pred_bias_logcts.ravel())
     metrics['bias_cts_pearson_nonpeaks'] = scipy.stats.pearsonr(*cur_pair)[0]
     metrics['bias_cts_spearman_nonpeaks'] = scipy.stats.spearmanr(*cur_pair)[0]
 

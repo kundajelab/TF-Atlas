@@ -113,14 +113,14 @@ else
     threads=2
 fi
 
-python src/train_chrombpnet.py \
-    -g ${reference_dir}/hg38.genome.fa \
-    -b ${data_dir}/$experiment.bigWig \
-    -p ${data_dir}/${experiment}_peaks.bed  \
-    -n ${data_dir}/${experiment}_non_peaks.bed \
-    -o $model_dir/${1} \
-    -e 1 \
-    -bm $bias_model
+# python src/train_chrombpnet.py \
+#     -g ${reference_dir}/hg38.genome.fa \
+#     -b ${data_dir}/$experiment.bigWig \
+#     -p ${data_dir}/${experiment}_peaks.bed  \
+#     -n ${data_dir}/${experiment}_non_peaks.bed \
+#     -o $model_dir/${1} \
+#     -e 1 \
+#     -bm $bias_model
 
 python src/metrics.py \
     -b ${data_dir}/$experiment.bigWig  \

@@ -27,30 +27,32 @@ task run_modelling {
 		echo "copying all files to cromwell_root folder"
 		
 		cp -r /project/model /cromwell_root/
-		cp -r /project/predictions_and_metrics_test_peaks_test_chroms /cromwell_root/
-		cp -r /project/predictions_and_metrics_test_peaks_all_chroms /cromwell_root/
 		cp -r /project/predictions_and_metrics_all_peaks_test_chroms /cromwell_root/
 		cp -r /project/predictions_and_metrics_all_peaks_all_chroms /cromwell_root/
 
 
-		cp -r /project/predictions_and_metrics_test_peaks_test_chroms/spearman.txt /cromwell_root/spearman.txt
-		cp -r /project/predictions_and_metrics_test_peaks_test_chroms/pearson.txt /cromwell_root/pearson.txt
-		cp -r /project/predictions_and_metrics_test_peaks_test_chroms/jsd.txt /cromwell_root/jsd.txt
+		cp -r /project/predictions_and_metrics_all_peaks_test_chroms/${experiment}.chrombpnet_profile_median_jsd_nonpeaks /cromwell_root/chrombpnet_profile_median_jsd_nonpeaks.txt
+		cp -r /project/predictions_and_metrics_all_peaks_test_chroms/${experiment}.chrombpnet_profile_median_jsd_nonpeaks_wo_bias /cromwell_root/chrombpnet_profile_median_jsd_nonpeaks_wo_bias.txt
+		cp -r /project/predictions_and_metrics_all_peaks_test_chroms/${experiment}.bias_profile_median_jsd_nonpeaks /cromwell_root/bias_profile_median_jsd_nonpeaks.txt
+
+
+		cp -r /project/predictions_and_metrics_all_peaks_test_chroms/${experiment}.chrombpnet_cts_pearson_peaks /cromwell_root/chrombpnet_cts_pearson_peaks.txt
+		cp -r /project/predictions_and_metrics_all_peaks_test_chroms/${experiment}.chrombpnet_cts_pearson_peaks_wo_bias /cromwell_root/chrombpnet_cts_pearson_peaks_wo_bias.txt
+		cp -r /project/predictions_and_metrics_all_peaks_test_chroms/${experiment}.bias_cts_pearson_peaks /cromwell_root/bias_cts_pearson_peaks.txt
 		
 	}
 	
 	output {
 		Array[File] model = glob("model/*")
-		Array[File] predictions_and_metrics_test_peaks_test_chroms = glob("predictions_and_metrics_test_peaks_test_chroms/*")
-		Array[File] predictions_and_metrics_test_peaks_all_chroms = glob("predictions_and_metrics_test_peaks_all_chroms/*")
-
-		Array[File] predictions_and_metrics_all_peaks_all_chroms = glob("predictions_and_metrics_all_peaks_all_chroms/*")
 		Array[File] predictions_and_metrics_all_peaks_test_chroms = glob("predictions_and_metrics_all_peaks_test_chroms/*")
+		Array[File] predictions_and_metrics_all_peaks_all_chroms = glob("predictions_and_metrics_all_peaks_all_chroms/*")
 
-		Float spearman = read_float("spearman.txt")
-		Float pearson = read_float("pearson.txt")
-		Float jsd = read_float("jsd.txt")
-	
+		Float chrombpnet_profile_median_jsd_nonpeaks = read_float("chrombpnet_profile_median_jsd_nonpeaks.txt")
+		Float chrombpnet_profile_median_jsd_nonpeaks_wo_bias = read_float("chrombpnet_profile_median_jsd_nonpeaks_wo_bias.txt")
+		Float bias_profile_median_jsd_nonpeaks = read_float("bias_profile_median_jsd_nonpeaks.txt")
+		Float chrombpnet_cts_pearson_peaks = read_float("chrombpnet_cts_pearson_peaks.txt")
+		Float chrombpnet_cts_pearson_peaks_wo_bias = read_float("chrombpnet_cts_pearson_peaks_wo_bias.txt")
+		Float bias_cts_pearson_peaks = read_float("bias_cts_pearson_peaks.txt")
 	
 	}
 
@@ -69,49 +71,36 @@ task run_modelling {
 
 workflow modelling {
 	input {
-		String experiment
-		File input_json
-		File training_input_json
-		File testing_input_json
-		File bpnet_params_json
-		File splits_json
+		String experiment		
 		File reference_file
-		File reference_file_index
 		File chrom_sizes
-		File chroms_txt
 		Array [File] bigwigs
 		File peaks
-		File peaks_for_testing
-		Float learning_rate
+		File non_peaks
+		File bias_model
 
 	}
 
 	call run_modelling {
 		input:
 			experiment = experiment,
-			input_json = input_json,
-			training_input_json = training_input_json,
-			testing_input_json = testing_input_json,
-			bpnet_params_json = bpnet_params_json,
-			splits_json = splits_json,
 			reference_file = reference_file,
-			reference_file_index = reference_file_index,	
 			chrom_sizes = chrom_sizes,
-			chroms_txt = chroms_txt,
 			bigwigs = bigwigs,
 			peaks = peaks,
-			peaks_for_testing = peaks_for_testing,
-			learning_rate = learning_rate
+			non_peaks = non_peaks,
+			bias_model = bias_model
  	}
 	output {
 		Array[File] model = run_modelling.model
 		Array[File] predictions_and_metrics_all_peaks_test_chroms = run_modelling.predictions_and_metrics_all_peaks_test_chroms
-		Array[File] predictions_and_metrics_test_peaks_test_chroms = run_modelling.predictions_and_metrics_test_peaks_test_chroms
 		Array[File] predictions_and_metrics_all_peaks_all_chroms = run_modelling.predictions_and_metrics_all_peaks_all_chroms
-		Array[File] predictions_and_metrics_test_peaks_all_chroms = run_modelling.predictions_and_metrics_test_peaks_all_chroms
-		Float spearman = run_modelling.spearman
-		Float pearson = run_modelling.pearson
-		Float jsd = run_modelling.jsd
-		
+		Float chrombpnet_profile_median_jsd_nonpeaks = run_modelling.chrombpnet_profile_median_jsd_nonpeaks
+		Float chrombpnet_profile_median_jsd_nonpeaks_wo_bias = run_modelling.chrombpnet_profile_median_jsd_nonpeaks_wo_bias
+		Float bias_profile_median_jsd_nonpeaks = run_modelling.bias_profile_median_jsd_nonpeaks
+		Float chrombpnet_cts_pearson_peaks = run_modelling.chrombpnet_cts_pearson_peaks
+		Float chrombpnet_cts_pearson_peaks_wo_bias = run_modelling.chrombpnet_cts_pearson_peaks_wo_bias
+		Float bias_cts_pearson_peaks = run_modelling.bias_cts_pearson_peaks
+			
 	}
 }
