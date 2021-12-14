@@ -44,12 +44,10 @@ encode_secret_key=$3
 # the place where the results of the pipeline run will be stored
 # either mnt or gcp. If "mnt" then output files are stored in 
 # --mnt target, or if "gcp" then the files are uploaded to gcp
-pipeline_destination=$4
 
-reference_file=${5}
-reference_file_index=${6}
-chrom_sizes=${7}
-
+reference_file=$4
+chrom_sizes=$5
+blacklist=$6
 
 # create log file
 logfile=$experiment.log
@@ -87,13 +85,13 @@ mkdir $bigWigs_dir
 
 echo $( timestamp ): "cp" $reference_file $reference_dir/ | \
 tee -a $logfile 
-echo $( timestamp ): "cp" $reference_file_index $reference_dir/ |\
-tee -a $logfile 
+#echo $( timestamp ): "cp" $reference_file_index $reference_dir/ |\
+#tee -a $logfile 
 
 
-cp $reference_file $reference_dir/
-cp $reference_file_index $reference_dir/
-cp $chrom_sizes $reference_dir/chrom.sizes
+cp $reference_file $reference_dir/hg38.genome.fa
+#cp $reference_file_index $reference_dir/
+cp $chrom_sizes $reference_dir"/chrom.sizes"
 
 # Step 2. download bam files and peaks file
 
@@ -122,8 +120,11 @@ fi
 # 2.5 download peaks file
 download_file $peaks "bed.gz" $peaks_md5sum 1 $logfile $encode_access_key \
 $encode_secret_key $downloads_dir
+# is there only one peak file in downloads_dir?
 
+echo $( timestamp ): [$!] " bedtools intersect -v -a" $downloads_dir"/*.bed.gz -b" $blacklist "| gzip >" $downloads_dir/peaks_no_blacklist.bed.gz
 
+bedtools intersect -v -a $downloads_dir/*.bed.gz -b $blacklist | gzip > $downloads_dir/peaks_no_blacklist.bed.gz
 wait_for_jobs_to_finish "Download"
 
 # Step 3. preprocess
@@ -148,7 +149,7 @@ build_pwm_from_bigwig.py \\
     -g $reference_dir/hg38.genome.fa \\
     -o $bigWigs_dir/$experiment$tag.png \\
     -c \"chr20\" \\
-    -cz $reference_dir/chrom.sizes  | tee -a $logfile
+    -cz $reference_dir/chrom.sizes"  | tee -a $logfile
     
 python \
     build_pwm_from_bigwig.py \

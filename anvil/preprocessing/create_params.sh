@@ -9,11 +9,7 @@ source ./utils.sh
 
 # command line params
 experiment=$1
-encode_access_key=$2
-encode_secret_key=$3
-#gbsc-gcp-lab-kundaje-tf-atlas
-pipeline_destination=$4
-metadata_file_path=$5
+metadata_file_path=$2
 
 # create the log file
 logfile=$PWD/$experiment.log

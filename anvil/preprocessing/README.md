@@ -7,6 +7,10 @@
 - What changed in the create_metadata notebook
 - make a check if all are atac or dnase
 - Is awk a unix tool already installed?
+- check if exiting step is correct in preprocessing
+- is there only onw peak file in downloads directory
+- added removing blacklist from peaks
+- adding multy threading with samtools -@8
 
 # Copy down the TF-Atlas scripts
 RUN git clone https://github.com/kundajelab/TF-Atlas.git

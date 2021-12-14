@@ -71,10 +71,10 @@ def plot_t(ax, base, left_edge, height, color):
 default_colors = {0:'green', 1:'blue', 2:'orange', 3:'red'}
 default_plot_funcs = {0:plot_a, 1:plot_c, 2:plot_g, 3:plot_t}
 def plot_weights_given_ax(ax, array,
-                 height_padding_factor,
-                 length_padding,
-                 subticks_frequency,
-                 highlight,
+                 height_padding_factor=0.2,
+                 length_padding=1.0,
+                 subticks_frequency=1.0,
+                 highlight={},
                  colors=default_colors,
                  plot_funcs=default_plot_funcs,
                  ylabel="",

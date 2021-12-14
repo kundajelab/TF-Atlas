@@ -5,31 +5,30 @@ task run_preprocess {
 		String experiment
 		String encode_access_key
 		String encode_secret_key
-		#gbsc-gcp-lab-kundaje-tf-atlas
-		String pipeline_destination
 		File metadata
 		File reference_file
-		File reference_file_index
 		File chrom_sizes
+		File blacklist
   	}	
 	command {
 		#create data directories and download scripts
 		cd /; mkdir my_data
 		cd /my_data
-		#does this have to be a gitlink to my scripts?
-		git clone https://github.com/viramalingam/tf_atlas_analysis.git
-		chmod -R 777 tf_atlas_analysis
-		cd tf_atlas_analysis/pipeline
+		git clone --single-branch --branch chromatin-atlas https://github.com/kundajelab/TF-Atlas.git
+		chmod -R 777 TF-Atlas
+		cd TF-Atlas/anvil/preprocessing
 
 		#run the params create script and preprocess script
-		echo "run ../create_params.sh"
-		../create_params.sh ${experiment} ${encode_access_key} ${encode_secret_key} ${pipeline_destination} ${metadata}
+		echo "run create_params.sh"
+		bash create_params.sh ${experiment} ${metadata}
 		cp params_file.json /cromwell_root/params_file.json	#copy the file to the root folder for cromwell to copy
 
 		##preprocessing
-		echo "run ../run_preprocess.sh"
-		../run_preprocess.sh params_file.json ${encode_access_key} ${encode_secret_key} ${pipeline_destination} ${reference_file} ${reference_file_index} ${chrom_sizes}
-		cp downloads/*.bed.gz /cromwell_root/peaks.bed.gz
+		echo "run run_preprocess.sh"
+		bash run_preprocess.sh params_file.json ${encode_access_key} ${encode_secret_key} ${reference_file}  ${chrom_sizes} ${blacklist}
+
+		# is there only one peak file in downloads_dir?
+		cp downloads/peaks_no_blacklist.bed.gz /cromwell_root/peaks.bed.gz
 		cp -r bigWigs /cromwell_root/
 		
 	}
@@ -53,12 +52,10 @@ workflow preprocess {
 		String experiment
 		String encode_access_key
 		String encode_secret_key
-		#gbsc-gcp-lab-kundaje-tf-atlas
-		String pipeline_destination
 		File metadata
 		File reference_file
-		File reference_file_index
 		File chrom_sizes
+		File blacklist
 	}
 
 	call run_preprocess {
