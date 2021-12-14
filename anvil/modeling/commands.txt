@@ -1,8 +1,0 @@
-docker build --no-cache /users/zahoor/TF-Atlas/TF-Atlas/kubernetes/modeling -t kundajelab/tf-atlas:gcp-modeling
-docker run -it --rm --cpus=8 --memory=30g --gpus device=0  kundajelab/tf-atlas:gcp-modeling
-docker push kundajelab/tf-atlas:gcp-modeling
-gcloud container clusters get-credentials tfatlas --zone us-central1-c
-kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/container-engine-accelerators/master/nvidia-driver-installer/cos/daemonset-preloaded.yaml
-
-
-python dynamic_yaml_submit.py job.yml.template "ENCSR625ZVM" encode4 bpnet_params.json 1_10 test2
