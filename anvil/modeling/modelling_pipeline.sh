@@ -9,20 +9,21 @@ function timestamp {
 }
 
 experiment=$1
-input_json=$2
-training_input_json=$3
-testing_input_json=$4
-bpnet_params_json=$5
-splits_json=$6
-reference_file=$7
-reference_file_index=$8
-chrom_sizes=$9
-chroms_txt=${10}
-bigwigs=${11}
-peaks=${12}
-peaks_for_testing=${13}
-learning_rate=${14}
+reference_file=$2
+chrom_sizes=$3
+bigwigs=$4
+peaks=$5
+non_peaks=$6
+bias_model=$7
 
+export CUDNN=cudnn-8.1_cuda11.2
+export cuda=cuda-11.2
+export LD_LIBRARY_PATH=/usr/local/$cuda/lib64:/usr/local/$CUDNN/lib64:/usr/local/$CUDNN/include:/usr/local/$cuda/extras/CUPTI/lib64:/usr/local/lib:$LD_LIBRARY_PATH
+export PATH=/usr/local/$cuda/bin:$PATH
+export CUDA_HOME=/usr/local/$cuda
+export CPATH="/usr/local/$CUDNN/include:${CPATH}"
+export LIBRARY_PATH="/usr/local/$CUDNN/lib64:${LIBRARY_PATH}"
+export CPLUS_INCLUDE_PATH=/usr/local/$cuda/include
 
 mkdir /project
 project_dir=/project
@@ -56,22 +57,9 @@ predictions_dir_all_peaks_test_chroms=$project_dir/predictions_and_metrics_all_p
 echo $( timestamp ): "mkdir" $predictions_dir_all_peaks_test_chroms| tee -a $logfile
 mkdir $predictions_dir_all_peaks_test_chroms
 
-# create the predictions directory with test_peaks and test chroms
-predictions_dir_test_peaks_test_chroms=$project_dir/predictions_and_metrics_test_peaks_test_chroms
-echo $( timestamp ): "mkdir" $predictions_dir_test_peaks_test_chroms | tee -a $logfile
-mkdir $predictions_dir_test_peaks_test_chroms
-
-# create the predictions directory with test_peaks and all_chroms
-predictions_dir_test_peaks_all_chroms=$project_dir/predictions_and_metrics_test_peaks_all_chroms
-echo $( timestamp ): "mkdir" $predictions_dir_test_peaks_all_chroms | tee -a $logfile
-mkdir $predictions_dir_test_peaks_all_chroms
-
 
 
 echo $( timestamp ): "cp" $reference_file ${reference_dir}/hg38.genome.fa | \
-tee -a $logfile 
-
-echo $( timestamp ): "cp" $reference_file_index ${reference_dir}/hg38.genome.fa.fai |\
 tee -a $logfile 
 
 echo $( timestamp ): "cp" $chrom_sizes ${reference_dir}/chrom.sizes |\
@@ -84,7 +72,6 @@ tee -a $logfile
 # copy down data and reference
 
 cp $reference_file $reference_dir/hg38.genome.fa
-cp $reference_file_index $reference_dir/hg38.genome.fa.fai
 cp $chrom_sizes $reference_dir/chrom.sizes
 cp $chroms_txt $reference_dir/hg38_chroms.txt
 
@@ -96,297 +83,59 @@ echo $bigwigs | sed 's/,/ /g' | xargs cp -t $data_dir/
 echo $( timestamp ): "cp" $bigwigs ${data_dir}/ |\
 tee -a $logfile 
 
-
-
-echo $( timestamp ): "cp" $peaks ${data_dir}/${experiment}_combined.bed.gz |\
+# copy peaks
+echo $( timestamp ): "cp" $peaks ${data_dir}/${experiment}_peaks.bed.gz |\
 tee -a $logfile 
 
-cp $peaks ${data_dir}/${experiment}_combined.bed.gz
+cp $peaks ${data_dir}/${experiment}_peaks.bed.gz
 
-echo $( timestamp ): "gunzip" ${data_dir}/${experiment}_combined.bed.gz |\
+echo $( timestamp ): "gunzip" ${data_dir}/${experiment}_peaks.bed.gz |\
 tee -a $logfile 
 
-gunzip ${data_dir}/${experiment}_combined.bed.gz
+gunzip ${data_dir}/${experiment}_peaks.bed.gz
 
-
-
-
-echo $( timestamp ): "cp" $peaks_for_testing ${data_dir}/${experiment}_peaks_only.bed.gz |\
+#copy non-peaks
+echo $( timestamp ): "cp" $non_peaks ${data_dir}/${experiment}_non_peaks.bed.gz |\
 tee -a $logfile 
 
-cp $peaks_for_testing ${data_dir}/${experiment}_peaks_only.bed.gz
+cp $non_peaks ${data_dir}/${experiment}_non_peaks.bed.gz
 
-
-echo $( timestamp ): "gunzip" ${data_dir}/${experiment}_peaks_only.bed.gz |\
+echo $( timestamp ): "gunzip" ${data_dir}/${experiment}_non_peaks.bed.gz |\
 tee -a $logfile 
 
-gunzip ${data_dir}/${experiment}_peaks_only.bed.gz
-
-
-
-
-
-# cp input json template
-
-# First the input json for the train command (with loci from 
-# the combined bed file, peaks + gc-matched negatives)
-
-echo $( timestamp ): "cp" $training_input_json \
-$project_dir/training_input.json | tee -a $logfile 
-cp $training_input_json $project_dir/training_input.json
-
-# modify the input json 
-echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/training_input.json 
-sed -i -e "s/<>/$1/g" $project_dir/training_input.json | tee -a $logfile 
-
-
-# Finally, the input json for the rest of the commands 
-
-echo $( timestamp ): "cp" $input_json \
-$project_dir/input.json | tee -a $logfile 
-cp $input_json $project_dir/input.json
-
-
-
-# modify the input json for 
-echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/input.json 
-sed -i -e "s/<>/$1/g" $project_dir/input.json | tee -a $logfile 
-
-
-echo $( timestamp ): "cp" $testing_input_json \
-$project_dir/testing_input.json | tee -a $logfile 
-cp $testing_input_json $project_dir/testing_input.json
-
-
-
-# modify the testing_input json for 
-echo  $( timestamp ): "sed -i -e" "s/<>/$1/g" $project_dir/testing_input.json 
-sed -i -e "s/<>/$1/g" $project_dir/testing_input.json | tee -a $logfile 
-
-
-
-# cp bpnet params json template
-echo $( timestamp ): "cp" $bpnet_params_json \
-$project_dir/bpnet_params.json| tee -a $logfile 
-cp $bpnet_params_json $project_dir/bpnet_params.json
-
-
-
-# cp splits json template
-echo $( timestamp ): "cp" $splits_json \
-$project_dir/splits.json | tee -a $logfile 
-cp $splits_json $project_dir/splits.json
-
-
-
-ls /project/data/
-cat $project_dir/input.json
-
-# compute the counts loss weight to be used for this experiment
-echo $( timestamp ): "counts_loss_weight=\`counts_loss_weight --input-data \
-$project_dir/input.json\`" | tee -a $logfile
-counts_loss_weight=`counts_loss_weight --input-data $project_dir/input.json`
-
-# print the counts loss weight
-echo $( timestamp ): "counts_loss_weight:" $counts_loss_weight | tee -a $logfile 
-
-# modify the bpnet params json to reflect the counts loss weight
-echo  $( timestamp ): "sed -i -e" "s/<>/$counts_loss_weight/g" \
-$project_dir/bpnet_params.json | tee -a $logfile 
-sed -i -e "s/<>/$counts_loss_weight/g" $project_dir/bpnet_params.json
+gunzip ${data_dir}/${experiment}_non_peaks.bed.gz
 
 #set threads based on number of peaks
 
-if [ $(wc -l < ${data_dir}/${experiment}_combined.bed) -lt 3500 ];then
+if [ $(wc -l < ${data_dir}/${experiment}_peaks.bed) -lt 3500 ];then
     threads=1
 else
     threads=2
 fi
 
+python src/train_chrombpnet.py \
+    -g ${reference_dir}/hg38.genome.fa \
+    -b ${data_dir}/$experiment.bigWig \
+    -p ${data_dir}/${experiment}_peaks.bed  \
+    -n ${data_dir}/${experiment}_non_peaks.bed \
+    -o $model_dir/${1} \
+    -e 1 \
+    -bm $bias_model
 
-echo $( timestamp ): "
-train \\
-    --input-data $project_dir/training_input.json \\
-    --output-dir $model_dir \\
-    --reference-genome $reference_dir/hg38.genome.fa \\
-    --chrom-sizes $reference_dir/chrom.sizes \\
-    --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt)  \\
-    --shuffle \\
-    --epochs 100 \\
-    --splits $project_dir/splits.json \\
-    --model-arch-name BPNet \\
-    --model-arch-params-json $project_dir/bpnet_params.json \\
-    --sequence-generator-name BPNet \\
-    --model-output-filename $1 \\
-    --input-seq-len 2114 \\
-    --output-len 1000 \\
-    --threads $threads \\
-    --reverse-complement-augmentation \\
-    --learning-rate $learning_rate" | tee -a $logfile 
+python src/metrics.py \
+    -b ${data_dir}/$experiment.bigWig  \
+    -g ${reference_dir}/hg38.genome.fa \
+    -p ${data_dir}/${experiment}_peaks.bed \
+    -n ${data_dir}/${experiment}_non_peaks.bed \
+    -o $project_dir/predictions_and_metrics_all_peaks_test_chroms/${1}\
+    -bm $model_dir/${1}.adjusted_bias_model.h5\
+    -cm $model_dir/${1}.h5 \
+    -tc "chr1"
 
-train \
-    --input-data $project_dir/training_input.json \
-    --output-dir $model_dir \
-    --reference-genome $reference_dir/hg38.genome.fa \
-    --chrom-sizes $reference_dir/chrom.sizes \
-    --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt)  \
-    --shuffle \
-    --epochs 100 \
-    --splits $project_dir/splits.json \
-    --model-arch-name BPNet \
-    --model-arch-params-json $project_dir/bpnet_params.json \
-    --sequence-generator-name BPNet \
-    --model-output-filename $1 \
-    --input-seq-len 2114 \
-    --output-len 1000 \
-    --threads $threads \
-    --reverse-complement-augmentation \
-    --learning-rate $learning_rate
-
-#get the test chromosome
-
-echo 'test_chromosome=jq .["0"]["test"][0] $project_dir/splits.json | sed s/"//g'
-
-test_chromosome=`jq '.["0"]["test"][0]' $project_dir/splits.json | sed 's/"//g'` 
-
-echo $( timestamp ): "
-fastpredict \\
-    --model $model_dir/${1}_split000.h5 \\
-    --chrom-sizes $reference_dir/chrom.sizes \\
-    --chroms $test_chromosome \\
-    --reference-genome $reference_dir/hg38.genome.fa \\
-    --output-dir $predictions_dir_all_peaks_test_chroms \\
-    --input-data $project_dir/input.json \\
-    --sequence-generator-name BPNet \\
-    --input-seq-len 2114 \\
-    --output-len 1000 \\
-    --output-window-size 1000 \\
-    --batch-size 64 \\
-    --generate-predicted-profile-bigWigs \\
-    --threads $threads" | tee -a $logfile 
-
-fastpredict \
-    --model $model_dir/${1}_split000.h5 \
-    --chrom-sizes $reference_dir/chrom.sizes \
-    --chroms $test_chromosome \
-    --reference-genome $reference_dir/hg38.genome.fa \
-    --output-dir $predictions_dir_all_peaks_test_chroms \
-    --input-data $project_dir/input.json \
-    --sequence-generator-name BPNet \
-    --input-seq-len 2114 \
-    --output-len 1000 \
-    --output-window-size 1000 \
-    --batch-size 64 \
-    --generate-predicted-profile-bigWigs \
-    --threads $threads
-
-
-
-echo $( timestamp ): "
-fastpredict \\
-    --model $model_dir/${1}_split000.h5 \\
-    --chrom-sizes $reference_dir/chrom.sizes \\
-    --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt) \\
-    --reference-genome $reference_dir/hg38.genome.fa \\
-    --output-dir $predictions_dir_all_peaks_all_chroms \\
-    --input-data $project_dir/input.json \\
-    --sequence-generator-name BPNet \\
-    --input-seq-len 2114 \\
-    --output-len 1000 \\
-    --output-window-size 1000 \\
-    --batch-size 64 \\
-    --generate-predicted-profile-bigWigs \\
-    --threads $threads" | tee -a $logfile 
-
-fastpredict \
-    --model $model_dir/${1}_split000.h5 \
-    --chrom-sizes $reference_dir/chrom.sizes \
-    --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt) \
-    --reference-genome $reference_dir/hg38.genome.fa \
-    --output-dir $predictions_dir_all_peaks_all_chroms \
-    --input-data $project_dir/input.json \
-    --sequence-generator-name BPNet \
-    --input-seq-len 2114 \
-    --output-len 1000 \
-    --output-window-size 1000 \
-    --batch-size 64 \
-    --generate-predicted-profile-bigWigs \
-    --threads $threads
-
-
-
-
-echo $( timestamp ): "
-fastpredict \\
-    --model $model_dir/${1}_split000.h5 \\
-    --chrom-sizes $reference_dir/chrom.sizes \\
-    --chroms $test_chromosome \\
-    --reference-genome $reference_dir/hg38.genome.fa \\
-    --output-dir $predictions_dir_test_peaks_test_chroms \\
-    --input-data $project_dir/testing_input.json \\
-    --sequence-generator-name BPNet \\
-    --input-seq-len 2114 \\
-    --output-len 1000 \\
-    --output-window-size 1000 \\
-    --batch-size 64 \\
-    --generate-predicted-profile-bigWigs \\
-    --threads $threads" | tee -a $logfile 
-
-fastpredict \
-    --model $model_dir/${1}_split000.h5 \
-    --chrom-sizes $reference_dir/chrom.sizes \
-    --chroms $test_chromosome \
-    --reference-genome $reference_dir/hg38.genome.fa \
-    --output-dir $predictions_dir_test_peaks_test_chroms \
-    --input-data $project_dir/testing_input.json \
-    --sequence-generator-name BPNet \
-    --input-seq-len 2114 \
-    --output-len 1000 \
-    --output-window-size 1000 \
-    --batch-size 64 \
-    --generate-predicted-profile-bigWigs \
-    --threads $threads
-
-
-echo $( timestamp ): "
-fastpredict \\
-    --model $model_dir/${1}_split000.h5 \\
-    --chrom-sizes $reference_dir/chrom.sizes \\
-    --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt) \\
-    --reference-genome $reference_dir/hg38.genome.fa \\
-    --output-dir $predictions_dir_test_peaks_all_chroms \\
-    --input-data $project_dir/testing_input.json \\
-    --sequence-generator-name BPNet \\
-    --input-seq-len 2114 \\
-    --output-len 1000 \\
-    --output-window-size 1000 \\
-    --batch-size 64 \\
-    --generate-predicted-profile-bigWigs \\
-    --threads $threads" | tee -a $logfile 
-
-fastpredict \
-    --model $model_dir/${1}_split000.h5 \
-    --chrom-sizes $reference_dir/chrom.sizes \
-    --chroms $(paste -s -d ' ' $reference_dir/hg38_chroms.txt) \
-    --reference-genome $reference_dir/hg38.genome.fa \
-    --output-dir $predictions_dir_test_peaks_all_chroms \
-    --input-data $project_dir/testing_input.json \
-    --sequence-generator-name BPNet \
-    --input-seq-len 2114 \
-    --output-len 1000 \
-    --output-window-size 1000 \
-    --batch-size 64 \
-    --generate-predicted-profile-bigWigs \
-    --threads $threads
-
-# create necessary files to copy the predictions results to cromwell folder
-
-tail -n 1 $predictions_dir_test_peaks_test_chroms/predict.log | awk '{a=$8;print (substr(a,2,6)+substr($9,1,6))/2}' > $predictions_dir_test_peaks_test_chroms/spearman.txt
-tail -n 2 $predictions_dir_test_peaks_test_chroms/predict.log | head -n 1 | awk '{a=$8;print (substr(a,2,6)+substr($9,1,6))/2}' > $predictions_dir_test_peaks_test_chroms/pearson.txt
-tail -n 7 $predictions_dir_test_peaks_test_chroms/predict.log | head -n 1 | awk '{print $NF}' > $predictions_dir_test_peaks_test_chroms/jsd.txt
-
-
-tail -n 1 $predictions_dir_all_peaks_test_chroms/predict.log | awk '{a=$8;print (substr(a,2,6)+substr($9,1,6))/2}' > $predictions_dir_all_peaks_test_chroms/spearman.txt
-tail -n 2 $predictions_dir_all_peaks_test_chroms/predict.log | head -n 1 | awk '{a=$8;print (substr(a,2,6)+substr($9,1,6))/2}' > $predictions_dir_all_peaks_test_chroms/pearson.txt
-tail -n 7 $predictions_dir_all_peaks_test_chroms/predict.log | head -n 1 | awk '{print $NF}' > $predictions_dir_all_peaks_test_chroms/jsd.txt
-
+# python marginal_footprinting.py  \
+#     -g ${reference_dir}/hg38.genome.fa \
+#     -r ${data_dir}/${experiment}_non_peaks.bed \
+#     -chr "chr1" -m /path/to/model.h5 \
+#     -o /path/to/output_dir/outputprefix \
+#     -pwm_f motif_to_pwm.tsv \
+#     -mo tn5_1,tn5_2,tn5_3,tn5_4,tn5_5 \

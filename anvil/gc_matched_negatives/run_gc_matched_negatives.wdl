@@ -4,40 +4,35 @@ task run_gc_matched_negatives {
 	input {
 		String experiment
 		File reference_file
-		File reference_file_index
 		File chrom_sizes
-		File chroms_txt
-		File reference_gc_hg38_stride_50_flank_size_1057
+		File blacklist
 		File peaks
-		Int ratio
-
+		File reference_gc_hg38_stride_50_flank_size_1057
   	}	
 	command {
 		#create data directories and download scripts
-		cd /; mkdir my_scripts
-		cd /my_scripts
-		git clone https://github.com/kundajelab/TF-Atlas.git
+		cd /; mkdir my_data
+		cd /my_data
+		git clone --single-branch --branch chromatin-atlas https://github.com/kundajelab/TF-Atlas.git
 		chmod -R 777 TF-Atlas
-		cd TF-Atlas/anvil/gc_matched_negatives/
-
-
-
+		cd TF-Atlas/anvil/gc_matched_negatives
 
 		##outlier_detection
 
-		echo "run /my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh" ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_50_flank_size_1057} ${peaks} ${ratio}
-		/my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_50_flank_size_1057} ${peaks} ${ratio}
+		echo "run gc_negatives.sh" ${experiment} ${reference_file} ${chrom_sizes} ${blacklist}  ${peaks} ${reference_gc_hg38_stride_50_flank_size_1057} 
+		
+		gc_negatives.sh ${experiment} ${reference_file} ${chrom_sizes} ${blacklist} ${peaks} ${reference_gc_hg38_stride_50_flank_size_1057}
 
 		echo "copying all files to cromwell_root folder"
 
-		gzip /project/data/peaks_gc_neg_combined.bed
+		gzip /project/data/negatives_with_summit.bed
 		
-		cp /project/data/peaks_gc_neg_combined.bed.gz /cromwell_root/peaks_gc_neg_combined.bed.gz
+		cp /project/data/negatives_with_summit.bed.gz /cromwell_root/negatives_with_summit.bed.gz
 		
 	}
 	
 	output {
-		File peaks_gc_neg_combined_bed = "peaks_gc_neg_combined.bed.gz"
+		File negatives_with_summit_bed = "negatives_with_summit.bed.gz"
 	
 	
 	}
@@ -55,27 +50,23 @@ workflow gc_matched_negatives {
 	input {
 		String experiment
 		File reference_file
-		File reference_file_index
 		File chrom_sizes
-		File chroms_txt
-		File reference_gc_hg38_stride_50_flank_size_1057
+		File blacklist
 		File peaks
-		Int ratio
+		File reference_gc_hg38_stride_50_flank_size_1057
 	}
 
 	call run_gc_matched_negatives {
 		input:
 			experiment = experiment,
 			reference_file = reference_file,
-			reference_file_index = reference_file_index,
 			chrom_sizes = chrom_sizes,
-			chroms_txt = chroms_txt,
 			reference_gc_hg38_stride_50_flank_size_1057 = reference_gc_hg38_stride_50_flank_size_1057,
-			peaks = peaks,
-			ratio = ratio
+			peaks = peaks
+
  	}
 	output {
-		File peaks_gc_neg_combined_bed = run_gc_matched_negatives.peaks_gc_neg_combined_bed
+		File negatives_with_summit_bed = run_gc_matched_negatives.negatives_with_summit_bed
 		
 	}
 }

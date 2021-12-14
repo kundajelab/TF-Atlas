@@ -11,12 +11,11 @@ function timestamp {
 
 experiment=$1
 reference_file=$2
-reference_file_index=$3
-chrom_sizes=$4
-chroms_txt=$5
+chrom_sizes=$3
+blacklist=$4
+peaks=$5
 reference_gc_hg38_stride_50_flank_size_1057=$6
-peaks=$7
-ratio=$8
+
 
 mkdir /project
 project_dir=/project
@@ -37,7 +36,6 @@ mkdir $reference_dir
 
 # copy down inliers bed file and reference files
 
-
 echo $( timestamp ): "cp" $peaks ${data_dir}/${1}_inliers.bed.gz |\
 tee -a $logfile 
 
@@ -53,13 +51,7 @@ gunzip ${data_dir}/${1}_inliers.bed.gz
 echo $( timestamp ): "cp" $reference_file ${reference_dir}/hg38.genome.fa | \
 tee -a $logfile 
 
-echo $( timestamp ): "cp" $reference_file_index ${reference_dir}/hg38.genome.fa.fai |\
-tee -a $logfile 
-
 echo $( timestamp ): "cp" $chrom_sizes ${reference_dir}/chrom.sizes |\
-tee -a $logfile 
-
-echo $( timestamp ): "cp" $chroms_txt ${reference_dir}/hg38_chroms.txt |\
 tee -a $logfile 
 
 echo $( timestamp ): "cp" $reference_gc_hg38_stride_50_flank_size_1057 ${reference_dir}/genomewide_gc_hg38_stride_50_flank_size_1057.bed |\
@@ -68,9 +60,7 @@ tee -a $logfile
 # copy down data and reference
 
 cp $reference_file ${reference_dir}/hg38.genome.fa
-cp $reference_file_index ${reference_dir}/hg38.genome.fa.fai
 cp $chrom_sizes $reference_dir/chrom.sizes
-cp $chroms_txt $reference_dir/hg38_chroms.txt
 cp $reference_gc_hg38_stride_50_flank_size_1057 ${reference_dir}/genomewide_gc_hg38_stride_50_flank_size_1057.bed
 
 
@@ -88,14 +78,17 @@ python get_gc_content.py \
        --flank_size 1057
 
 echo $( timestamp ): "
+bedtools slop $data_dir/${1}_inliers.bed -g $chrom_sizes -b 1057 > $data_dir/${1}_inliers_slop.bed" | tee -a $logfile
+
+echo $( timestamp ): "
 bedtools intersect -v -a \\
     $reference_dir/genomewide_gc_hg38_stride_50_flank_size_1057.bed \\
-    -b $data_dir/${1}_inliers.bed > $data_dir/${experiment}.tsv" | \
+    -b $data_dir/${1}_inliers_slop.bed $blacklist > $data_dir/${experiment}.tsv" | \
     tee -a $logfile 
 
 bedtools intersect -v -a \
 $reference_dir/genomewide_gc_hg38_stride_50_flank_size_1057.bed \
--b $data_dir/${1}_inliers.bed > $data_dir/${experiment}.tsv
+-b $data_dir/${1}_inliers.bed $blacklist > $data_dir/${experiment}.tsv
 
 echo $( timestamp ): "
 python get_gc_matched_negatives.py \\
@@ -108,27 +101,9 @@ python get_gc_matched_negatives.py \
         --foreground_gc_bed  $data_dir/$experiment.gc.bed \
         --out_prefix $data_dir/${experiment}_negatives.bed
 
-# select negatives based on specified ratio
+# convert negatives bed file to summit centered version
 
-# count the number of lines in the bed file
-echo $( timestamp ): "num_negatives=`cat $data_dir/${experiment}_negatives.bed | wc -l`" | tee -a $logfile 
-num_negatives=`cat $data_dir/${experiment}_negatives.bed | wc -l`
+echo $( timestamp ): "awk -v OFS=\"\t\" '{print \$1, \$2, \$3, \".\",  \".\", \".\", \".\", \".\", \".\", \"1057\"}' $data_dir/${experiment}_negatives.bed \\
+                > $data_dir/${experiment}_negatives_with_summit.bed" | tee -a $logfile 
 
-# number of lines to select
-echo $( timestamp ): "num_select=($num_negatives / $ratio)" | tee -a $logfile 
-num_select=$(( num_negatives / ratio ))
-
-# select random rows
-echo $( timestamp ): "shuf -n" $num_select $data_dir/${experiment}_negatives.bed \
-">" $data_dir/${experiment}_negatives_select.bed | tee -a $logfile 
-shuf -n $num_select $data_dir/${experiment}_negatives.bed > \
-    $data_dir/${experiment}_negatives_select.bed
-
-# combine the gc matched negatives and the original peaks file into 
-# a single file
-echo $( timestamp ): "cat" $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives_select.bed ">" \
-    $data_dir/peaks_gc_neg_combined.bed  | tee -a $logfile 
-
-cat $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives_select.bed > \
-    $data_dir/peaks_gc_neg_combined.bed
-
+awk -v OFS="\t" '{print $1, $2, $3, ".",  ".", ".", ".", ".", ".", "1057"}' $data_dir/${experiment}_negatives.bed > $data_dir/${experiment}_negatives_with_summit.bed
