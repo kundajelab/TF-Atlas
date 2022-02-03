@@ -72,7 +72,6 @@ task run_modelling {
 		gpuType: "nvidia-tesla-k80"
 		gpuCount: 1
 		nvidiaDriverVersion: "418.87.00"
-		preemptible: 1
   		maxRetries: 3 
 	}
 }
