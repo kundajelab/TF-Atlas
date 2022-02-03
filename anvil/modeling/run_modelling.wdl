@@ -67,9 +67,9 @@ task run_modelling {
 	runtime {
 		docker: 'vivekramalingam/tf-atlas:gcp-modeling'
 		memory: 32 + "GB"
-		bootDiskSizeGb: 100
-		disks: "local-disk 250 HDD"
-		gpuType: "nvidia-tesla-p100"
+		bootDiskSizeGb: 50
+		disks: "local-disk 100 HDD"
+		gpuType: "nvidia-tesla-k80"
 		gpuCount: 1
 		nvidiaDriverVersion: "418.87.00"
 		preemptible: 1
