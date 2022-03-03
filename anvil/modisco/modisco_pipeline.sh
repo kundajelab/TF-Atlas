@@ -57,12 +57,14 @@ echo $( timestamp ): "
 motif_discovery \\
     --scores-path $shap_dir/profile_scores.h5 \\
     --output-directory $modisco_profile_dir \\
-    --number-of-cpus $number_of_cpus" | tee -a $logfile
+    --number-of-cpus $number_of_cpus
+    --max-seqlets-per-metacluster 20000" | tee -a $logfile
 
 motif_discovery \
     --scores-path $shap_dir/profile_scores.h5 \
     --output-directory $modisco_profile_dir \
-    --number-of-cpus $number_of_cpus
+    --number-of-cpus $number_of_cpus \
+    --max-seqlets-per-metacluster 20000
     
 echo $( timestamp ): "
 motif_discovery \\
