@@ -59,7 +59,7 @@ workflow modisco {
 
 	Int mem_gb=32
 
-	Int number_of_cpus=8
+	Int number_of_cpus=16
 
 
 
