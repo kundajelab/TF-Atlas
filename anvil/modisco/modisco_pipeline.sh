@@ -68,12 +68,14 @@ echo $( timestamp ): "
 motif_discovery \\
     --scores-path $shap_dir/counts_scores.h5 \\
     --output-directory $modisco_counts_dir\\
-    --number-of-cpus $number_of_cpus" | tee -a $logfile
+    --number-of-cpus $number_of_cpus \\
+    --max-seqlets-per-metacluster 20000" | tee -a $logfile
 
 motif_discovery \
     --scores-path $shap_dir/counts_scores.h5 \
     --output-directory $modisco_counts_dir \
-    --number-of-cpus $number_of_cpus
+    --number-of-cpus $number_of_cpus \
+    --max-seqlets-per-metacluster 20000
 
 awk '$1=="Mem:"{print $3}' $logfile | sort -n | tail -n 1 > /cromwell_root/max_memory_gb.txt
 
