@@ -69,7 +69,7 @@ workflow performance_reports {
 			splits_json = splits_json
  	}
 	output {
-		File performance_reports = run_reports.performance_reports
+		File performance_reports = run_performance_reports.performance_reports
 
 	}
 }
