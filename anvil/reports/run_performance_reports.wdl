@@ -1,12 +1,13 @@
 version 1.0
 
-task run_reports {
+task run_performance_reports{
 	input {
 		String experiment
 		File peaks
 		Array [File] predictions_test_chrom
 		Array [File] predictions_all_chrom
 		File splits_json
+
 
   	}	
 	command {
@@ -19,8 +20,8 @@ task run_reports {
 
 		##shap
 
-		echo "run /my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh" ${experiment} ${peaks} ${sep=',' predictions_test_chrom} ${sep=',' predictions_all_chrom} ${splits_json}
-		/my_scripts/TF-Atlas/anvil/reports/reports_pipeline.sh ${experiment} ${peaks} ${sep=',' predictions_test_chrom} ${sep=',' predictions_all_chrom} ${splits_json}
+		echo "run /my_scripts/TF-Atlas/anvil/reports/performance_reports_pipeline.sh" ${experiment} ${peaks} ${sep=',' predictions_test_chrom} ${sep=',' predictions_all_chrom} ${splits_json}
+		/my_scripts/TF-Atlas/anvil/reports/performance_reports_pipeline.sh ${experiment} ${peaks} ${sep=',' predictions_test_chrom} ${sep=',' predictions_all_chrom} ${splits_json}
 
 		echo "copying all files to cromwell_root folder"
 		
@@ -34,41 +35,41 @@ task run_reports {
 	output {
 
 		File performance_reports = "reports/performance.html"
-		
 	
 	
 	}
 
 	runtime {
 		docker: 'vivekramalingam/tf-atlas:gcp-reports'
-		memory: 20 + "GB"
+		memory: 4 + "GB"
 		bootDiskSizeGb: 50
-		disks: "local-disk 100 HDD"
+		disks: "local-disk 50 HDD"
   		maxRetries: 1
 	}
 }
 
-workflow reports {
+workflow performance_reports {
 	input {
 		String experiment
 		File peaks
 		Array [File] predictions_test_chrom
 		Array [File] predictions_all_chrom
+		Array [File] shap
 		File splits_json
 
 	}
 
-	call run_reports {
+	call run_performance_reports {
 		input:
 			experiment = experiment,
 			peaks = peaks,
 			predictions_test_chrom = predictions_test_chrom,
 			predictions_all_chrom = predictions_all_chrom,
+			shap = shap,	
 			splits_json = splits_json
  	}
 	output {
 		File performance_reports = run_reports.performance_reports
-
 
 	}
 }

@@ -53,7 +53,8 @@ mkdir $predictions_metrics_all_dir
 
 
 
-# copy down bed file, shap, predictions, modisco files
+
+# copy down bed file, shap, predictions files
 
 
 echo $( timestamp ): "cp" $predictions_metrics_test ${predictions_metrics_test_dir}/ |\
@@ -66,6 +67,7 @@ echo $( timestamp ): "cp" $predictions_metrics_all ${predictions_metrics_all_dir
 tee -a $logfile 
 
 echo $predictions_metrics_all | sed 's/,/ /g' | xargs cp -t $predictions_metrics_all_dir/
+
 
 
 
