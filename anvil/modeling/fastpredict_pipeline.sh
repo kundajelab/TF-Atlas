@@ -157,13 +157,14 @@ cp $splits_json $project_dir/splits.json
 
 
 #set threads based on number of peaks
+#
+# if [ $(wc -l < ${data_dir}/${experiment}_combined.bed) -lt 3500 ];then
+#     threads=1
+# else
+#     threads=2
+# fi
 
-if [ $(wc -l < ${data_dir}/${experiment}_combined.bed) -lt 3500 ];then
-    threads=1
-else
-    threads=2
-fi
-
+threads=1
 
 #get the test chromosome
 
