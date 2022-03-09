@@ -118,7 +118,7 @@ tee -a $logfile
 echo $modisco_profile | sed 's/,/ /g' | xargs cp -t $modisco_profile_dir/
 
 
-tomtom_motif_database_dir
+#tomtom_motif_database_dir
 
 echo $( timestamp ): "cp" $tomtom_database ${tomtom_motif_database_dir}/HOCOMOCO_JASPAR_motifs.txt |\
 tee -a $logfile 
