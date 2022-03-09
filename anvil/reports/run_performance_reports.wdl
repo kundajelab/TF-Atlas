@@ -54,7 +54,6 @@ workflow performance_reports {
 		File peaks
 		Array [File] predictions_test_chrom
 		Array [File] predictions_all_chrom
-		Array [File] shap
 		File splits_json
 
 	}
@@ -65,7 +64,6 @@ workflow performance_reports {
 			peaks = peaks,
 			predictions_test_chrom = predictions_test_chrom,
 			predictions_all_chrom = predictions_all_chrom,
-			shap = shap,	
 			splits_json = splits_json
  	}
 	output {
