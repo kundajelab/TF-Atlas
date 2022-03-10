@@ -185,6 +185,11 @@ cat $project_dir/input.json
 # compute the counts loss weight to be used for this experiment
 echo $( timestamp ): "counts_loss_weight=\`counts_loss_weight --input-data \
 $project_dir/input.json\`" | tee -a $logfile
+
+#default counts_loss_weight
+counts_loss_weight=100
+
+#compute the counts_loss_weight; if it does not work default will be used
 counts_loss_weight=`counts_loss_weight --input-data $project_dir/input.json`
 
 # print the counts loss weight
