@@ -33,20 +33,26 @@ task run_gc_matched_negatives {
 		gzip /project/data/peaks_gc_neg_combined.bed
 		
 		cp /project/data/peaks_gc_neg_combined.bed.gz /cromwell_root/peaks_gc_neg_combined.bed.gz
+
+		gzip /project/data/gc_neg_only.bed
+		
+		cp /project/data/gc_neg_only.bed.gz /cromwell_root/gc_neg_only.bed.gz
 		
 	}
 	
 	output {
 		File peaks_gc_neg_combined_bed = "peaks_gc_neg_combined.bed.gz"
+
+		File gc_neg_only_bed = "gc_neg_only.bed.gz"
 	
 	
 	}
 
 	runtime {
 		docker: 'kundajelab/tf-atlas:gcp-gc-matched-negatives'
-		memory: 32 + "GB"
+		memory: 8 + "GB"
 		bootDiskSizeGb: 50
-		disks: "local-disk 100 HDD"
+		disks: "local-disk 50 HDD"
 
 	}
 }
@@ -76,6 +82,8 @@ workflow gc_matched_negatives {
  	}
 	output {
 		File peaks_gc_neg_combined_bed = run_gc_matched_negatives.peaks_gc_neg_combined_bed
+
+		File gc_neg_only_bed = run_gc_matched_negatives.gc_neg_only_bed
 		
 	}
 }
