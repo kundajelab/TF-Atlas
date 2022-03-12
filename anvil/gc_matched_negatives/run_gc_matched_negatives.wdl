@@ -7,7 +7,7 @@ task run_gc_matched_negatives {
 		File reference_file_index
 		File chrom_sizes
 		File chroms_txt
-		File reference_gc_hg38_stride_50_flank_size_1057
+		File reference_gc_hg38_stride_1000_flank_size_1057
 		File peaks
 
   	}	
@@ -24,8 +24,8 @@ task run_gc_matched_negatives {
 
 		##outlier_detection
 
-		echo "run /my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh" ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_50_flank_size_1057} ${peaks}
-		/my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_50_flank_size_1057} ${peaks}
+		echo "run /my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh" ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_1000_flank_size_1057} ${peaks}
+		/my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_1000_flank_size_1057} ${peaks}
 
 		echo "copying all files to cromwell_root folder"
 
@@ -58,7 +58,7 @@ workflow gc_matched_negatives {
 		File reference_file_index
 		File chrom_sizes
 		File chroms_txt
-		File reference_gc_hg38_stride_50_flank_size_1057
+		File reference_gc_hg38_stride_1000_flank_size_1057
 		File peaks
 	}
 
@@ -69,7 +69,7 @@ workflow gc_matched_negatives {
 			reference_file_index = reference_file_index,
 			chrom_sizes = chrom_sizes,
 			chroms_txt = chroms_txt,
-			reference_gc_hg38_stride_50_flank_size_1057 = reference_gc_hg38_stride_50_flank_size_1057,
+			reference_gc_hg38_stride_1000_flank_size_1057 = reference_gc_hg38_stride_1000_flank_size_1057,
 			peaks = peaks,
  	}
 	output {
