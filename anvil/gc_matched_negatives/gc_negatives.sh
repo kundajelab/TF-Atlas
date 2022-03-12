@@ -109,9 +109,9 @@ python get_gc_matched_negatives.py \
 
 
 # also export the negatives only file
-echo $( timestamp ): "mv" $data_dir/${experiment}_negatives_select.bed \
+echo $( timestamp ): "mv" $data_dir/${experiment}_negatives.bed \
     $data_dir/gc_neg_only.bed  | tee -a $logfile 
 
-cat $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives_select.bed > \
+cat $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives.bed > \
     $data_dir/gc_neg_only.bed
 
