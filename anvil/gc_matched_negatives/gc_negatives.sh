@@ -16,7 +16,6 @@ chrom_sizes=$4
 chroms_txt=$5
 reference_gc_hg38_stride_50_flank_size_1057=$6
 peaks=$7
-ratio=$8
 
 mkdir /project
 project_dir=/project
@@ -107,30 +106,6 @@ python get_gc_matched_negatives.py \
         --candidate_negatives $data_dir/${experiment}.tsv \
         --foreground_gc_bed  $data_dir/$experiment.gc.bed \
         --out_prefix $data_dir/${experiment}_negatives.bed
-
-# select negatives based on specified ratio
-
-# count the number of lines in the bed file
-echo $( timestamp ): "num_negatives=`cat $data_dir/${experiment}_negatives.bed | wc -l`" | tee -a $logfile 
-num_negatives=`cat $data_dir/${experiment}_negatives.bed | wc -l`
-
-# number of lines to select
-echo $( timestamp ): "num_select=($num_negatives / $ratio)" | tee -a $logfile 
-num_select=$(( num_negatives / ratio ))
-
-# select random rows
-echo $( timestamp ): "shuf -n" $num_select $data_dir/${experiment}_negatives.bed \
-">" $data_dir/${experiment}_negatives_select.bed | tee -a $logfile 
-shuf -n $num_select $data_dir/${experiment}_negatives.bed > \
-    $data_dir/${experiment}_negatives_select.bed
-
-# combine the gc matched negatives and the original peaks file into 
-# a single file
-echo $( timestamp ): "cat" $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives_select.bed ">" \
-    $data_dir/peaks_gc_neg_combined.bed  | tee -a $logfile 
-
-cat $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives_select.bed > \
-    $data_dir/peaks_gc_neg_combined.bed
 
 
 # also export the negatives only file

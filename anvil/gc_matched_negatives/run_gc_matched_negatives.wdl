@@ -9,7 +9,6 @@ task run_gc_matched_negatives {
 		File chroms_txt
 		File reference_gc_hg38_stride_50_flank_size_1057
 		File peaks
-		Int ratio
 
   	}	
 	command {
@@ -25,14 +24,10 @@ task run_gc_matched_negatives {
 
 		##outlier_detection
 
-		echo "run /my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh" ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_50_flank_size_1057} ${peaks} ${ratio}
-		/my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_50_flank_size_1057} ${peaks} ${ratio}
+		echo "run /my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh" ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_50_flank_size_1057} ${peaks}
+		/my_scripts/TF-Atlas/anvil/gc_matched_negatives/gc_negatives.sh ${experiment} ${reference_file} ${reference_file_index} ${chrom_sizes} ${chroms_txt} ${reference_gc_hg38_stride_50_flank_size_1057} ${peaks}
 
 		echo "copying all files to cromwell_root folder"
-
-		gzip /project/data/peaks_gc_neg_combined.bed
-		
-		cp /project/data/peaks_gc_neg_combined.bed.gz /cromwell_root/peaks_gc_neg_combined.bed.gz
 
 		gzip /project/data/gc_neg_only.bed
 		
@@ -41,7 +36,6 @@ task run_gc_matched_negatives {
 	}
 	
 	output {
-		File peaks_gc_neg_combined_bed = "peaks_gc_neg_combined.bed.gz"
 
 		File gc_neg_only_bed = "gc_neg_only.bed.gz"
 	
@@ -66,7 +60,6 @@ workflow gc_matched_negatives {
 		File chroms_txt
 		File reference_gc_hg38_stride_50_flank_size_1057
 		File peaks
-		Int ratio
 	}
 
 	call run_gc_matched_negatives {
@@ -78,10 +71,8 @@ workflow gc_matched_negatives {
 			chroms_txt = chroms_txt,
 			reference_gc_hg38_stride_50_flank_size_1057 = reference_gc_hg38_stride_50_flank_size_1057,
 			peaks = peaks,
-			ratio = ratio
  	}
 	output {
-		File peaks_gc_neg_combined_bed = run_gc_matched_negatives.peaks_gc_neg_combined_bed
 
 		File gc_neg_only_bed = run_gc_matched_negatives.gc_neg_only_bed
 		
