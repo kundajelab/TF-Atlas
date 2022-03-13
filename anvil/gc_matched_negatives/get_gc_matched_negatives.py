@@ -22,7 +22,6 @@ def remap_chrom(chrom, splits_dict):
     Remapping chromosome names - we will not differentiate between the train/valid/tes chromsomes
     when sampling negatives.
     '''
-    print(splits_dict)
     if chrom in splits_dict["0"]["train"]:
         chrom_mod = "chrom_train"
     elif chrom in splits_dict["0"]["val"]:
