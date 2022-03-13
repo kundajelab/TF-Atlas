@@ -141,6 +141,7 @@ if __name__=="__main__":
         # for every gc value in positive how many negatives to find
         # we will keep the ratio of positives to negatives in the test set same
         for rep in range(neg_to_pos_ratio):
+            print(neg_to_pos_ratio)
             cur_gc,used_negatives=adjust_gc(chrom,gc_value,negatives,used_negatives)
             num_candidates=len(negatives[chrom][cur_gc])
             rand_neg_index=random.randint(0,num_candidates-1)
@@ -156,6 +157,7 @@ if __name__=="__main__":
             neg_end=neg_tuple[2]
             neg_chrom_real=neg_tuple[3]
             negatives_bed.append([neg_chrom_real,int(neg_start),int(neg_end), cur_gc]) 
+            len(negatives_bed)
             output_gc_vals.append(cur_gc)
             foreground_gc_vals.append(gc_value)       
   
