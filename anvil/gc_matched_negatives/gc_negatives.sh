@@ -16,6 +16,7 @@ chrom_sizes=$4
 chroms_txt=$5
 reference_gc_hg38_stride_1000_flank_size_1057=$6
 peaks=$7
+split_folds=$8
 
 mkdir /project
 project_dir=/project
@@ -100,12 +101,16 @@ echo $( timestamp ): "
 python get_gc_matched_negatives.py \\
         --candidate_negatives $data_dir/${experiment}.tsv \\
         --foreground_gc_bed  $data_dir/$experiment.gc.bed \\
-        --out_prefix $data_dir/${experiment}_negatives.bed" | tee -a $logfile 
+        --out_prefix $data_dir/${experiment}_negatives.bed \\
+        --chr_fold_path $split_folds\\
+        --neg_to_pos_ratio_train 4" \\ | tee -a $logfile 
 
 python get_gc_matched_negatives.py \
         --candidate_negatives $data_dir/${experiment}.tsv \
         --foreground_gc_bed  $data_dir/$experiment.gc.bed \
-        --out_prefix $data_dir/${experiment}_negatives.bed
+        --chr_fold_path $split_folds \
+        --out_prefix $data_dir/${experiment}_negatives.bed \
+        --neg_to_pos_ratio_train 4
 
 
 # also export the negatives only file
