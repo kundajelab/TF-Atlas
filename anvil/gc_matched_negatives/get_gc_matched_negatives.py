@@ -25,7 +25,7 @@ def remap_chrom(chrom, splits_dict):
     print(splits_dict)
     if chrom in splits_dict["0"]["train"]:
         chrom_mod = "chrom_train"
-    elif chrom in splits_dict["0"]["valid"]:
+    elif chrom in splits_dict["0"]["val"]:
         chrom_mod = "chrom_valid"
     elif chrom in splits_dict["0"]["test"]:
         chrom_mod = "chrom_test"
