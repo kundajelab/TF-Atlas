@@ -157,7 +157,7 @@ if __name__=="__main__":
             neg_end=neg_tuple[2]
             neg_chrom_real=neg_tuple[3]
             negatives_bed.append([neg_chrom_real,int(neg_start),int(neg_end), cur_gc]) 
-            len(negatives_bed)
+            print(len(negatives_bed))
             output_gc_vals.append(cur_gc)
             foreground_gc_vals.append(gc_value)       
   

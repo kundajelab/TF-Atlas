@@ -101,7 +101,7 @@ echo $( timestamp ): "
 python get_gc_matched_negatives.py \\
         --candidate_negatives $data_dir/${experiment}.tsv \\
         --foreground_gc_bed  $data_dir/$experiment.gc.bed \\
-        --output_prefix $data_dir/${experiment}_negatives.bed \\
+        --output_prefix $data_dir/${experiment}_negatives \\
         --chr_fold_path $split_folds\\
         --neg_to_pos_ratio_train 4" \\ | tee -a $logfile 
 
@@ -109,7 +109,7 @@ python get_gc_matched_negatives.py \
         --candidate_negatives $data_dir/${experiment}.tsv \
         --foreground_gc_bed  $data_dir/$experiment.gc.bed \
         --chr_fold_path $split_folds \
-        --output_prefix $data_dir/${experiment}_negatives.bed \
+        --output_prefix $data_dir/${experiment}_negatives \
         --neg_to_pos_ratio_train 4
 
 
@@ -117,6 +117,7 @@ python get_gc_matched_negatives.py \
 echo $( timestamp ): "mv" $data_dir/${experiment}_negatives.bed \
     $data_dir/gc_neg_only.bed  | tee -a $logfile 
 
-cat $data_dir/${1}_inliers.bed $data_dir/${experiment}_negatives.bed > \
-    $data_dir/gc_neg_only.bed
+mv $data_dir/${experiment}_negatives.bed $data_dir/gc_neg_only.bed
+
+mv $data_dir/${experiment}_negatives_compared_with_foreground.png $data_dir/gc_distribution.png
 

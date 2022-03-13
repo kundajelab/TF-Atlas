@@ -33,13 +33,14 @@ task run_gc_matched_negatives {
 		gzip /project/data/gc_neg_only.bed
 		
 		cp /project/data/gc_neg_only.bed.gz /cromwell_root/gc_neg_only.bed.gz
+		cp /project/data/gc_distribution.png /cromwell_root/gc_distribution.png
 		
 	}
 	
 	output {
 
 		File gc_neg_only_bed = "gc_neg_only.bed.gz"
-	
+		File gc_distribution_png = "gc_distribution.png"
 	
 	}
 
@@ -78,6 +79,7 @@ workflow gc_matched_negatives {
 	output {
 
 		File gc_neg_only_bed = run_gc_matched_negatives.gc_neg_only_bed
-		
+		File gc_distribution_png = run_gc_matched_negatives.gc_distribution_png
+	
 	}
 }
