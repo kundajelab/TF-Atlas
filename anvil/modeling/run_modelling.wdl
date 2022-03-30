@@ -65,7 +65,7 @@ task run_modelling {
 	}
 
 	runtime {
-		docker: 'vivekramalingam/tf-atlas:gcp-modeling_dev'
+		docker: 'vivekramalingam/tf-atlas:gcp-modeling'
 		memory: 32 + "GB"
 		bootDiskSizeGb: 50
 		disks: "local-disk 100 HDD"
